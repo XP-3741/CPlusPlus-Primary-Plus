@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="brass.cpp" />
     <ClCompile Include="Chapter_Thirteen.cpp" />
   </ItemGroup>
   <ItemGroup>
