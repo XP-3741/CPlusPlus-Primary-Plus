@@ -73,6 +73,12 @@ BrassPlus::BrassPlus(const Brass& ba, double ml, double r)
 	owesBank = 0.0;
 	rate = r;
 }
+// 派生类不能直接访问基类的私有成员,必须使用基类的公有方法才能访问这些数据
+// 访问的方式取决于方法,构造函数使用一种技术,而其它成员函数使用另一种技术
+// 派生类构造函数在初始化基类私有数据时,采用成员初始化列表语法
+// 将基类信息传递给基类构造函数,然后使用构造函数体初始化 BrassPlus 类新增的数据项
+// 非构造函数不能使用成员初始化列表语法
+//
 
 // redefine how ViewAcct() works
 void BrassPlus::ViewAcct() const
@@ -88,6 +94,13 @@ void BrassPlus::ViewAcct() const
 	cout << "Loan Rate: " << 100 * rate << "%\n";
 	restore(initialState, prec);
 }
+// 派生类方法可以调用公有的基类方法
+// 换句话说, BrassPlus::ViewAcct()显示新增的 BrassPlus 数据成员
+// 并调用基类方法 Brass::ViewAcct() 来显示基类数据成员
+// 在派生类中,标准技术是使用作用域解析运算符来调用基类方法
+// 如果没有作用域解析运算符,编译器将认为 ViewAcct() 是 BrassPlus::ViewAcct()
+// 这将创建不会终止的递归函数
+//
 
 // redefine how WirhDraw() works
 void BrassPlus::Withdraw(double amt)
