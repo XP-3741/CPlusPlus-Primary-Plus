@@ -109,7 +109,8 @@ void BrassPlus::Withdraw(double amt)
 	format initialState = setFormat();
 	precis prec = cout.precision(2);
 
-	double bal = Balance();
+	//double bal = Balance;
+	double bal = 0;
 	if (amt <= bal)
 		Brass::Withdraw(amt);
 	else if (amt <= bal + maxLoan - owesBank)

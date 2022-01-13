@@ -1,8 +1,15 @@
 #include<iostream>
+#include<string>
+#include"brass.h"
+const int CLIENTS = 4;
 
 int main()
 {
 	// P488续
+
+	using std::cin;
+	using std::cout;
+	using std::endl;
 
 	// 派生类和基类之间的特殊关系
 	//	- 其中之一是派生类对象可以使用基类的方法,条件是方法不是私有的
@@ -40,9 +47,56 @@ int main()
 	//	有两种重要的机制可用于实现多态公有继承:
 	//		- 在派生类中重新定义基类的方法
 	//		- 使用虚方法
-	// 
-	// 
-	//
+	
+	// 演示虚方法的行为
+	// 如果能使用同一个数组来保存 Brsss 和 BrassPlus 对象,将很有帮助
+	// 但这是不可能的.数组中所有元素的类型必须相同,而 Brass 和 BrassPlus 是不同的类型
+	// 然而,可以创建指向 Brass 的指针数组,这样每个元素的类型都相同,但由于使用的是
+	// 公有继承模型,因此 Brass 指针可以指向 Brass 对象,也可以指向 BrassPlus 对象
+	// 因此,可以使用一个数组来表示多种类型的对象,这就是多态性
+	Brass* p_clients[CLIENTS];
+	std::string temp;
+	long tempnum;
+	double tempbal;
+	char kind;
+	for (int i = 0; i < CLIENTS; i++)
+	{
+		cout << "Enter client's name: ";
+		getline(cin, temp);
+		cout << "Enter client's account number: ";
+		cin >> tempnum;
+		cout << "Enter opening ba;ance: $";
+		cin >> tempbal;
+		cout << "Enter 1 for Brass Account or "
+			<< "2 for BrassPlus Account: ";
+
+		while (cin >> kind && (kind != '1' && kind != '2'))
+			cout << "Enter either 1 or 2: ";
+		if (kind == '1')
+			p_clients[i] = new Brass(temp, tempnum, tempbal);
+		else
+		{
+			double tmax, trate;
+			cout << "Enter the overdraft limit: $";
+			cin >> tmax;
+			cout << "Enter the interest rate "
+				<< "as a decimal fraction: ";
+			cin >> trate;
+			p_clients[i] = new BrassPlus(temp, tempnum, tempbal,
+										tmax, trate);
+		}
+		while (cin.get() != '\n')
+			continue;
+	}
+	cout << endl;
+	for (int i = 0; i < CLIENTS; i++) {
+		p_clients[i]->ViewAcct();
+		cout << endl;
+	}
+	for (int i = 0; i < CLIENTS; i++) {
+		delete p_clients[i];
+	}
+	cout << "Done.\n";
 
 	return 0;
 }
