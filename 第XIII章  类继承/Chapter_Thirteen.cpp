@@ -130,6 +130,33 @@ int main()
 	//	如果从 BrassPlus 派生出 BrassPlusPlus 类
 	//	则 Brass 指针或引用可以引用 Brass 对象、BrassPlus 对象或 BrassPlusPlus 对象
 	// 相反的过程-将基类指针或引用转换为派生类指针或引用,称为 向下强制转换(downcasting)
+	//	如果不使用显式类型转换,则向下强制类型转换是不允许的
+	//	原因是 is-a 关系通常是不可逆的
+	//	派生类可以新增数据成员,因此使用这些数据成员的类成员函数不能应用于基类
+	// 对于使用基类引用或指针作为参数的函数调用,将进行向上转换
+	//		这里假定每个函数都调用虚方法 ViewAcct()
+	//		void fr(Brass & rb);	// uses rb.ViewAcct()
+	//		void fp(Brass * pb);	// uses pb->ViewAcct()
+	//		void fv(Brass b);		// uses b.ViewAcct()
+	//		int main()
+	//		{
+	//			Brass b("Billy Bee", 123412, 1000.0);
+	//			BrassPlus bp("Beety Beep", 123321, 123.0);
+	//			fr(b);		// uses Brass::ViewAcct()
+	//			fr(bp);		// uses BrassPlus::ViewAcct()
+	//			fp(b);		// uses Brass::ViewAcct()
+	//			fp(bp);		// uses BrassPlus::ViewAcct()
+	//			fv(b);		// uses Brass::ViewAcct()
+	//			fv(bp);		// uses Brass::ViewAcct()
+	//		}
+	//	按值传递导致只将 BrassPlus 对象的 Brass 部分传递给函数 fv()
+	//	但随引用和指针发生的隐式向上转换导致函数 fr() 和 fp()
+	//	分别为 Brass 对象和 BrassPlus 对象使用 Brass::ViewAcct() 和 BrassPlus::ViewAcct()
+	// 隐式向上强制转换使基类指针或引用可以指向基类对象或派生类对象,因此需要动态联编
+	// C++使用虚成员函数来满足这种需求
+
+	// 虚成员函数和动态联编
+	//	 
 	//
 
 	return 0;
