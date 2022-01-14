@@ -98,5 +98,39 @@ int main()
 	}
 	cout << "Done.\n";
 
+	// 静态联编和动态联编
+	// 将源代码中的函数调用解释为执行特定的函数代码块被称为 函数名联编(binding)
+	//	在编译过程中进行联编被称为 静态联编(static binding),又称为 早期联编(early binding)
+	// 然而,虚函数使这项工作变得困难,正如上述程序,使用哪一个函数是不能在编译时确定的
+	// 因为编译器不知道用户将选择哪种类型的对象
+	//	所以,编译器必须生成能够在程序运行时选择正确的虚函数方法,
+	//	这被称为 动态联编(dynamic binding),又称为 晚期联编(late binding)
+	
+	// 指针和引用类型的兼容性
+	//  在 C++ 中,动态联编与通过指针和引用调用方法相关,从某种程度上说,这是由继承控制的
+	//	公有继承建立 is-a 关系的一种方法是如何处理指向对象的指针和引用
+	//	通常,C++不允许将一种类型的地址赋给另一种类型的指针,也不允许一种类型的引用指向另一种类型:
+	//		double x = 2.5;
+	//		int *pi = &x;
+	//			// invalid assignment, mismatched pointer types
+	//		long &rl = x;
+	//			// invalid assignment, mismatched pointer types
+	//	然而,指向基类的引用或指针可以使用派生类对象,而不必进行显示类型转换
+	//		BrassPlus dilly("FUCKYOU", 666666, 250);
+	//		Brass *pb = &dilly;		// ok
+	//		Brass &rb = dilly;		// ok 
+	// 将派生类引用或指针转换为基类引用或指针被称为 向上强制转换(upcasting)
+	//	这使公有继承不需要进行显式类型转换,该规则使 is-a 关系的一部分
+	//	BrassPlus 对象都是 Brass 对象,因为它继承了 Brass 对象所有数据成员和成员函数
+	//	所以,可以对 Brass 对象执行的任何操作,都适用于 BrassPlus 对象
+	//	因此,为处理 Brass 引用而设计的函数可以对 BrassPlus 对象执行相同的操作
+	//	而不必担心导致任何问题
+	//	将指向对象的指针作为函数参数时,也是如此
+	//	向上强制转换是可以传递的
+	//	如果从 BrassPlus 派生出 BrassPlusPlus 类
+	//	则 Brass 指针或引用可以引用 Brass 对象、BrassPlus 对象或 BrassPlusPlus 对象
+	// 相反的过程-将基类指针或引用转换为派生类指针或引用,称为 向下强制转换(downcasting)
+	//
+
 	return 0;
 }
