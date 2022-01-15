@@ -246,6 +246,29 @@ int main()
 	//					如果只重新定义一个版本,则另外两个版本将被隐藏,派生类对象将无法使用它们
 	//					注意,如果不需要修改,则新定义可只调用基类版本:
 	//					void Hovel::showperks() const { Dwelling::showperks(); }
+
+	// 访问控制: protected
+	//	 关键字 protected 与 privated 相似,在类外只能用公有类成员
+	//	 来访问 protected 部分中的类成员
+	//	 protected 和 privated 之间的区别只有在基类派生的类中才会表现出来
+	//	 派生类的成员可以直接访问基类的保护乘员,但不能直接访问基类的私有成员
+	//	 因此,对于外部世界来说,保护成员的行为与私有成员类似
+	//	 但对于派生类来说,保护成员的行为与公有成员相似
+	//	 使用保护数据成员可以简化代码的编写工作,但存在设计缺陷
+	//	 例如,继续以 BrassPlus 为例,如果 balance 是受保护的
+	//	 则可以按照下面方式编写:
+	//		void BrassPlus::Reset(double amt)
+	//		{
+	//			balance = amt;
+	//		}
+	//	 Brass 类被设计成只能通过 Deposit() 和 Withdraw() 才能修改 balance
+	//	 但对于 BrassPlus 对象,Reset()方法将忽略 withdraw() 中的保护措施,实际上使 balance 称为公有变量
+	//	 警告:最好对类数据成员采用私有访问控制,不要使用保护访问控制
+	//		同时通过基类方法使派生类能够访问基类数据
+	//	 然而,对于成员函数来说,保护访问控制很有用,它让派生类能够访问公众不能使用的内部函数
+
+	// 抽象基类(abstract base class, ABC)
+	//	 
 	//
 
 	return 0;
