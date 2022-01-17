@@ -268,7 +268,23 @@ int main()
 	//	 然而,对于成员函数来说,保护访问控制很有用,它让派生类能够访问公众不能使用的内部函数
 
 	// 抽象基类(abstract base class, ABC)
-	//	 
+	//	从 Ellipse 和 Circle 类中抽象出它们的共性,将这些特性放到一个ABC中
+	//	然后从该ABC派生出 Ellipse 和 Circle 类
+	//	这样便可以使用基类指针数组同时管理 Ellipse 和 Circle 对象(多态)
+	//	C++通过使用纯虚函数(pure virtual function)提供未实现的函数
+	//	纯虚函数的结尾处为=0:
+	//		class BaseEllipse	// abstract base class
+	//		{
+	//		private:
+	//			double x;
+	//			double y;
+	//		pbulic:
+	//			BaseEllipse(double xo = 0,double yo = 0) : x(xo),y(yo)	{}
+	//			virtual ~BaseEllipse() {}
+	//			void Move(int nx, int ny)	{ x = nx; y = ny;}
+	//			virtual double Area() const = 0;	// a pure virtual function
+	//			...
+	//		}
 	//
 
 	return 0;
