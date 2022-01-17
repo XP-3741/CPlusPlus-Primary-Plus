@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
 #include"brass.h"
+#include"acctabc.h"
 const int CLIENTS = 4;
 
 int main()
@@ -298,6 +299,54 @@ int main()
 	//		总之,在原型中使用=0指出类是一个抽象基类,在类中可以不定义该函数
 	//		像 Ellipse 和 Circle 这样的类有时被称为 具体(concrete)类
 	//		这表示可以创建这些类型的对象
+	
+	AcctABC* P_Client[CLIENTS];
+	std::string Temp;
+	long Tempnum;
+	double Tempbal;
+	char Kind;
+
+	for (int i = 0; i < CLIENTS; i++)
+	{
+		cout << "Enter client's name: ";
+		getline(cin, Temp);
+		cout << "Enter client's account number: ";
+		cin >> Tempnum;
+		cout << "Enter opening ba;ance: $";
+		cin >> Tempbal;
+		cout << "Enter 1 for Brass Account or "
+			<< "2 for BrassPlus Account: ";
+
+		while (cin >> Kind && (Kind != '1' && Kind != '2'))
+			cout << "Enter either 1 or 2: ";
+		if (Kind == '1')
+			P_Client[i] = new Brass_ABC(Temp, Tempnum, Tempbal);
+		else
+		{
+			double tmax, trate;
+			cout << "Enter the overdraft limit: $";
+			cin >> tmax;
+			cout << "Enter the interest rate "
+				<< "as a decimal fraction: ";
+			cin >> trate;
+			P_Client[i] = new BrassPlus_ABC(Temp, Tempnum, Tempbal,
+				tmax, trate);
+		}
+		while (cin.get() != '\n')
+			continue;
+	}
+
+	// ABC理念
+	//	在处理继承问题上,ABC方法比TatedPlayer示例更具有系统性、规范性
+	//	设计ABC之前,首先应开发一个模型----指出编程问题所需的类以及它们之间相互关系
+	//	可以将ABC看作是一种必须实施的接口
+	//	ABC要求具体派生类覆盖其纯虚函数----迫使派生类遵循ABC设置的接口规则
+	//	这种模型在基于组件的编程模式中很常见
+	//	在这种情况下,使用ABC使得组件设计人员能够指定"接口约定"
+	//	这样确保了从ABC派生的所有组件都至少支持ABC指定的功能
+
+	// 继承和动态内存分配
+	//	
 	//
 
 	return 0;
