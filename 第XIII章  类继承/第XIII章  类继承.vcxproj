@@ -139,10 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="acctABC.cpp" />
     <ClCompile Include="brass.cpp" />
     <ClCompile Include="Chapter_Thirteen.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="acctabc.h" />
     <ClInclude Include="brass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
