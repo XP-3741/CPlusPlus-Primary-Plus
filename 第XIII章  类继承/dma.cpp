@@ -1,5 +1,6 @@
 #include"dma.h"
 #include<cstring>
+#pragma warning(disable:4996)
 
 // baseDMA methods
 baseDMA::baseDMA(const char* l, int r)

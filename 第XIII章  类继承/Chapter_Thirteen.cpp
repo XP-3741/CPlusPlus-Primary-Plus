@@ -2,7 +2,8 @@
 #include<string>
 #include"brass.h"
 #include"acctabc.h"
-const int CLIENTS = 4;
+#include"dma.h"
+const int CLIENTS = 1;
 
 int main()
 {
@@ -345,9 +346,25 @@ int main()
 	//	在这种情况下,使用ABC使得组件设计人员能够指定"接口约定"
 	//	这样确保了从ABC派生的所有组件都至少支持ABC指定的功能
 
-	// 继承和动态内存分配
-	//	
-	//
+	// 继承和动态内存分配	P516
+	//	第一种情况:派生类不使用new	...
+	//	第二种情况:派生类使用new	...
+	baseDMA shirt("Portabelly", 8);
+	lacksDMA balloon("red", "Blimpo", 4);
+	hasDMA map("Mercator", "Buffalo Keys", 5);
+	cout << "Displaying baseDMA object:\n";
+	cout << shirt << endl;
+	cout << "Displaying lacksDMA object:\n";
+	cout << balloon << endl;
+	cout << "Displaying hasDMA object:\n";
+	cout << map << endl;
+	lacksDMA balloon2(balloon);
+	cout << "Result of lacksDMA copy:\n";
+	cout << balloon2 << endl;
+	hasDMA map2 = map;
+	cout << "Result of hasDMA assignment:\n";
+	cout << map2 << endl;
 
+	// 类设计回顾	P523
 	return 0;
 }
