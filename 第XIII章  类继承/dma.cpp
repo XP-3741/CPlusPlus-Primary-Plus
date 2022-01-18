@@ -55,7 +55,8 @@ lacksDMA::lacksDMA(const char* c, const baseDMA& rs) :baseDMA(rs)
 
 std::ostream& operator<<(std::ostream& os, const lacksDMA& ls)
 {
-	os << (baseDMA&)ls;
+	/*os << (baseDMA&)ls;*/
+	os << dynamic_cast<const baseDMA&>(ls);
 	os << "Color: " << ls.color << std::endl;
 	return os;
 }
