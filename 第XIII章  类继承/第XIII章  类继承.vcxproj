@@ -142,10 +142,12 @@
     <ClCompile Include="acctABC.cpp" />
     <ClCompile Include="brass.cpp" />
     <ClCompile Include="Chapter_Thirteen.cpp" />
+    <ClCompile Include="dma.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acctabc.h" />
     <ClInclude Include="brass.h" />
+    <ClInclude Include="dma.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
