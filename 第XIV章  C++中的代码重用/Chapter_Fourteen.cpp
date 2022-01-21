@@ -1,4 +1,14 @@
 #include<valarray>
+#include<iostream>
+#include"studentc.h"
+using std::cin;
+using std::cout;
+using std::endl;
+
+void set(Student& sa, int n);
+
+const int pupils = 3;
+const int quizzes = 5;
 
 int main()
 {
@@ -40,6 +50,86 @@ int main()
 	//	获得接口是 is-a 关系的组成部分
 	//	而是用组合,类可以获得实现,但不能获得接口
 	//	不继承接口是 has-a 关系的组成部分
+
+	// 关键词 explicit 用法:
+	//		explicit Student(const std::string& s)
+	//				:name(s), scores() {}	
+	//		explicit Student(int n)
+	//				:name("Nully"), scores(n) {}
+	//	可以用一个参数调用的构造函数将用作从参数类型到类类型的隐式转换函数
+	//	但这通常不是好主意
+	//	上述第二个,参数表示数组元素的个数,而不是数组中的值
+	//	因此将一个构造函数用作 int 到 student 的转换函数是没有意义的
+	//	所以使用 explicit 关闭隐式转换
+	//	如果省略:
+	//	Student doh("Homer", 10);	// store "Homer", create array of 10 elements
+	//	doh = 5;	// reset name to "Nully", reset to empty array of 5 elements
+	//	如果构造函数省略 explicit ,则将使用构造函数调用 Student(5)
+	//	将5转换为一个临时 Student 对象
+	//	使用了 explicit ,编译器将认为上述运算符是错误的
+
+	// 成员初始化列表
+	//	如果不使用成员初始化列表
+	//	C++要求在构建对象的其他部分之前,先构建继承对象的所有成员对象
+	//	因此,如果省略初始化列表,C++将使用成员对象所属类的默认构造函数
+	// 初始化顺序
+	//	当初始化列表包含多个项目时,这些项目被初始化的顺序为它们被声明的顺序
+	//	而不是它们在初始化列表中的顺序
+	//	如果代码用一个成员的值作为另一个成员的初始化表达式的一部分
+	//	初始化顺序就非常重要了
+
+	// 使用被包含对象的接口
+	//	被包含对象的接口不是公有的,但可以在类方法中使用它
+	
+	// Student(Studenti) 类测试
+	Student ada[pupils] =
+	{ Student(quizzes),Student(quizzes), Student(quizzes) };
+
+	int i;
+	for (i = 0; i < pupils; i++)
+		set(ada[i], quizzes);
+	cout << "\nStudent List:\n";
+	for (i = 0; i < pupils; i++)
+		cout << ada[i].Name() << endl;
+	cout << "\nResults:";
+	for (i = 0; i < pupils; i++)
+	{
+		cout << endl << ada[i];
+		cout << "average: " << ada[i].Average() << endl;
+	}
+	cout << "Done.\n";
+	// cin.get();
+
+	// 私有继承
+	//	C++的另一种实现 has-a 关系的途径----私有继承
+	//	使用私有继承,基类的公有成员和保护成员都将成为派生类的私有成员
+	//	这意味这基类方法将不会成为派生类对象公有接口的一部分
+	//	但可以在派生类的成员函数中使用它们
+	// 
+	//	使用公有继承,基类的公有方法将成为派生类的公有方法
+	//		总之,派生类将继承基类的接口:这是 is-a 关系的一部分
+	//	使用私有继承,基类的公有方法将成为派生类的私有方法
+	//		总之,派生类不继承基类的接口
+	//		正如从被包含对象中看到的,这种不完全继承是 has-a 关系的一部分
+	// 
+	//	使用私有继承,类将继承实现
+	// 
+	//	包含将对象作为一个命名的成员对象添加到类中
+	//	而私有继承将对象作为一个未命名的继承对象添加到类中
+	//	用术语 子对象(subobject)来表示通过继承或包含添加的对象
+	//	因此,私有继承提供的特性与包含相同:获得实现,但不获得接口
 	//
+
 	return 0;
+}
+
+void set(Student& sa, int n)
+{
+	cout << "Please enter the student's name: ";
+	getline(cin, sa);
+	cout << "Please enter " << n << " quiz scores:\n";
+	for (int i = 0; i < n; i++)
+		cin >> sa[i];
+	while (cin.get() != '\n')
+		continue;
 }
