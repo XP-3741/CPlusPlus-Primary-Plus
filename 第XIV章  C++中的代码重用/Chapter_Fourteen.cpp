@@ -1,10 +1,13 @@
 #include<valarray>
 #include<iostream>
+#include<cstring>
 #include"studentc.h"
 #include"Worker0.h"
+#include"workermi.h"
 using std::cin;
 using std::cout;
 using std::endl;
+using std::strchr;
 
 void set(Student& sa, int n);
 
@@ -12,6 +15,8 @@ const int pupils = 3;
 const int quizzes = 5;
 
 const int LIM = 4;
+
+const int SIZE = 5;
 
 int main()
 {
@@ -213,8 +218,90 @@ int main()
 	//	而不是各自引入自己的 Worker 对象副本
 	// 
 	// 新的构造函数规则
-	//	
+	//	对于非虚基类,唯一可以出现在初始化列表中的构造函数是即是基类构造函数
+	//	但这些构造函数可能需要将信息传递给其基类
+	//		class A
+	//		{
+	//			int a;
+	//		public:
+	//			A(int n = 0) : a(n) {}
+	//			... 
+	//		};
+	//		class B : public A
+	//		{
+	//			int b;
+	//		public:
+	//			b(int m = 0,int n = 0) : A(n), b(m) {}
+	//			... 
+	//		};
+	//		class C : public B
+	//		{
+	//			int c;
+	//		public:
+	//			A(int q = 0,int m = 0,int n = 0) : B(m,n), c(q) {}
+	//			... 
+	//		};
+	//	C类构造函数只能调用B类构造函数,而B类构造函数只能调用A类构造函数
+	//	如果Worker是虚基类,则这种信息自动传递将不起作用
+	//		SingingWaiter(const Worker & wk, int p = 0, int v = Singer::other)
+	//						: Waiter(wk,p), Singer(wk,v) {}		// flawed
+	//	存在的问题是,自动传递信息时,将通过两条不同的路径(Singer和Waiter)将wk传递给Worker对象
+	//	为避免冲突,C++在基类是虚的时,禁止信息通过中间类自动传递给基类
+	//	因此<上述构造函数将初始化成员panache和voice,但wk参数中的信息将不会传递给子对象Waiter
+	//	然而,编译器必须在构造派生对象之前构造基类对象组件
+	//	上述情况下,编译器将使用 Worker 的默认构造函数
+	//	如需要显示地调用所需基类构造函数:
+	//		SingingWaiter(const Worker & wk, int p = 0, int v = Singer::other)
+	//						: Worker(wk), Waiter(wk,p), Singer(wk,v) {}		// flawed
+	//	这种用法是合法的,对于虚基类,必须这样做
+	//	但对于非虚基类,则是非法的
+	//	如果类有间接虚基类.则除非只需要该虚基类的默认构造函数,否则必须显示地调用该虚基类的某个构造函数
 	//
+	// SingingWaiter类测试
+	Worker* lolas[SIZE];
+	int ct;
+	for (ct = 0; ct < SIZE; ct++)
+	{
+		char choice;
+		cout << "Enter the employee category:\n"
+			<< "w: waiter  s: singer  "
+			<< "t: singing waiter  q: quit\n";
+		cin >> choice;
+		while (strchr("wstq", choice) == NULL)
+		{
+			cout << "Please enter a w, s, t, or q: ";
+			cin >> choice;
+		}
+		if (choice == 'q')
+			break;
+		switch (choice)
+		{
+		case 'w':   lolas[ct] = new Waiter;
+			break;
+		case 's':   lolas[ct] = new Singer;
+			break;
+		case 't':   lolas[ct] = new SingingWaiter;
+			break;
+		}
+		cin.get();
+		lolas[ct]->Set();
+	}
+
+	cout << "\nHere is your staff:\n";
+	int i;
+	for (i = 0; i < ct; i++)
+	{
+		cout << endl;
+		lolas[i]->Show();
+	}
+	for (i = 0; i < ct; i++)
+		delete lolas[i];
+	cout << "Bye.\n";
+	// cin.get();
+	// cin.get();
+	//	C-风格字符串函数 strchr()
+	//	该函数返回参数 choice 指定的字符在字符串 "wstq" 中第一次出现的地址
+	//  如果没有这样的字符,则返回NULL指针
 	return 0;
 }
 
