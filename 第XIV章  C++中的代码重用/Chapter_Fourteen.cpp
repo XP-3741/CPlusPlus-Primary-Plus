@@ -1,10 +1,13 @@
 #include<valarray>
 #include<iostream>
 #include<cstring>
+#include<cstdlib>		// for rand(),srand()
+#include<ctime>			// for time()
 #include"studentc.h"
 #include"Worker0.h"
 #include"workermi.h"
 #include"stacktp.h"
+#include"stcktp1.h"
 using std::cin;
 using std::cout;
 using std::endl;
@@ -18,6 +21,8 @@ const int quizzes = 5;
 const int LIM = 4;
 
 const int SIZE = 5;
+
+const int Num = 10;
 
 int main()
 {
@@ -324,7 +329,7 @@ int main()
 	//	关键字 template 告诉编译器,将要定义一个模板
 	//	尖括号中的内容相当于函数的参数列表
 	//	可以把关键字 class 看作是变量的类型名,该变量接受类型作为其值
-	//	把 Type 看作是该变量的名称
+	//	把 Type 看作是该变量的名称,称为类型参数(type parameter)
 	//	这里的 class 并不意味着 Type 必须是一个类
 	//	而只是表明 Type 是一个通用的类型说明符,在使用模板时,将使用实际的类型替换他
 	//	较新的C++实现允许在这种情况下使用不太容易混淆的关键字 typename 代替 class
@@ -340,9 +345,51 @@ int main()
 	//	并在要使用这些模板的文件中包含该头文件
 	// 
 	// 使用模板类
+	//	仅在程序包含模板并不能生成模板,而必须请求实例化
 	Stack<int> kernels;
 	Stack<std::string> colonels;
-	//
+	//	编译器将按 Stack<Type> 模板来生成两个独立的类声明和两组独立的类方法
+	// 
+	// 正确使用指针栈
+	//	方法之一是,让调用程序提供一个指针数组,其中每个指针都指向不同的字符串
+	// 
+	// Stack_P类测试
+	std::srand(std::time(0));		// randomize rand()
+	std::cout << "Please enter stack size: ";
+	int stacksize;
+	std::cin >> stacksize;
+// create an empty stack with stacksize slots
+	Stack_P<const char*>st(stacksize);
+// in basket
+	const char* in[Num] = {
+			" 1: Hank Gilgamesh", " 2: Kiki Ishtar",
+			" 3: Betty Rocker", " 4: Ian Flagranti",
+			" 5: Wolfgang Kibble", " 6: Portia Koop",
+			" 7: Joy Almondo", " 8: Xaverie Paprika",
+			" 9: Juan Moore", "10: Misha Mache"
+	};
+// out basket
+	const char* out[Num];
+
+	int processed = 0;
+	int nextin = 0;
+	while (processed < Num)
+	{
+		if (st.isempty())
+			st.push(in[nextin++]);
+		else if (st.isfull())
+			st.pop(out[processed++]);
+		else if (std::rand() % 2 && nextin < Num)	// 50-50 chance
+			st.push(in[nextin++]);
+		else
+			st.pop(out[processed++]);
+	}
+	for (int i = 0; i < Num; i++)
+		cout << out[i] << endl;
+
+	std::cout << "Bye\n";
+	// std::cin.get();
+	// std::cin.get();
 	return 0;
 }
 
