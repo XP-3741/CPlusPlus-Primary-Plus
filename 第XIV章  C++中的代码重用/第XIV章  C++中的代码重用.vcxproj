@@ -146,6 +146,7 @@
     <ClCompile Include="workermi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="stacktp.h" />
     <ClInclude Include="studentc.h" />
     <ClInclude Include="studenti.h" />
     <ClInclude Include="Worker0.h" />
