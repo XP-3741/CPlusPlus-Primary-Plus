@@ -50,5 +50,11 @@
     <ClInclude Include="stcktp1.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="arraytp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="pairs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,10 +8,14 @@
 #include"workermi.h"
 #include"stacktp.h"
 #include"stcktp1.h"
+#include"arraytp.h"
+#include"pairs.h"
+
 using std::cin;
 using std::cout;
 using std::endl;
 using std::strchr;
+using std::string;
 
 void set(Student& sa, int n);
 
@@ -390,6 +394,113 @@ int main()
 	std::cout << "Bye\n";
 	// std::cin.get();
 	// std::cin.get();
+
+	// 数组模板示例和非类型参数
+	//	允许指定数组大小的简单模板:
+	//		方法一:在类中使用动态数组和构造函数参数来提供元素(Stack_P类)
+	//		方法二:使用模板参数来提供常规数组大小(STL::array类、ArrayTP类)
+	//	 template<class T,int n>
+	//	 关键字 class(typename) 指出 T 为类型参数,int 指出 n 的类型为 int
+	//	 这种参数(指定特殊类型而不是用作泛型名)称为 非类型(non-type) 或 表达式(expression) 参数
+	//	表达式参数有一些限制:
+	//		-表达式参数可以是整形、枚举、引用或指针
+	//			因此,double m 是不合法的,但 double * pm 是合法的
+	//		-另外,模板代码不能修改参数的值,也不能使用参数的地址
+	//			所以,ArrayTP 模板不能使用如 n++ 和 &n 登表达式
+	//		-实例化模板时,用作表达式参数的值必须是常量表达式
+	//	优点:
+	//		-构造函数方法使用的是 new 和 delete 管理的堆内存
+	//		 而参数表达式使用的是为自动变量维护的内存栈,速度更快
+	//	缺点:
+	//		-每种数组大小都将生成自己的模板
+	//		 也就是说,下面声明将生成两个独立的类声明:
+	//			ArrayTP<double, 12> eggweights;
+	//			ArrayTP<double, 13> donuts;
+	//		 但下面的声明只生成一个类声明:
+	//			Stack_P<int> eggs(12);
+	//			Stack_P<int> dunkers(13);
+	//		-构造函数发放更通用,因为数组大小是作为类成员(而不是硬编码)存储在定义中的
+	//		 这样可以将一种尺寸的数组赋给另一种尺寸的数组,也可以创建允许数组大小可变的类
+
+	// 模板多功能性
+	//	可以将用于常规类的技术用于模板类
+	//	模板可用作基类,也可用作组件类,还可用作其他模板的类型参数
+	//		template<typename T>
+	//		class Array
+	//		{
+	//		private:
+	//			T entry;
+	//			...
+	//		};
+	//		
+	//		template<typename Type>
+	//		class GrowArray : public Array<Type>
+	//		{ ... };
+	// 
+	//		template<typename Tp>
+	//		class Stack
+	//		{
+	//			Array<Tp> ar;
+	//			...
+	//		};
+	//		...
+	//		Array< Stack<int> > asi;
+	// 
+	// 递归使用模板
+	ArrayTP<ArrayTP<int, 5>, 10> two;
+	//		这使得 two 是一个包含10个元素的数组,其中每个元素是一个包含5个int元素的数组
+	//		与之等价的是:
+	//		int two[10][5];
+	ArrayTP<int, 10> sums;
+	ArrayTP<double, 10> aves;
+	ArrayTP<ArrayTP<int, 5>, 10>twodee;
+	int i, j;
+	for (i = 0; i < 10; i++) {
+		sums[i] = 0;
+		for (j = 0; j < 5; j++) {
+			twodee[i][j] = (i + 1) * (j + 1);
+			sums[i] += twodee[i][j];
+		}
+		aves[i] = (double)sums[i] / 10;
+	}
+	for (i = 0; i < 10; i++)
+	{
+		for (j = 0; j < 5; j++)
+		{
+			cout.width(2);	// 设置新域宽,返回旧域宽
+			cout << twodee[i][j] << ' ';
+		}
+		cout << ": sum = ";
+		cout.width(3);	// 设置新域宽
+		cout << sums[i] << ", average = " << aves[i] << endl;
+	}
+	cout << "Done.\n";
+	// std::cin.get();
+	// 
+	// 使用多个类型参数
+	//	模板可以包含多个参数类型(STL::pair 、Pair)
+	Pair<string, int>rating[4] =
+	{
+		Pair<string,int>("The Purpled Duck",5),
+		Pair<string,int>("Jaquie's Frisco Al Fresco", 4),
+		Pair<string,int>("Cafe Souffle", 5),
+		Pair<string,int>("Bertie's Eats", 3)
+	};
+
+	int joints = sizeof(rating) / sizeof(Pair<string, int>);
+	cout << "Rating:\t Eatery\n";
+	for (int i = 0; i < joints; i++)
+		cout << rating[i].second() << ":\t"
+			<< rating[i].first() << endl;
+	cout << "Oops! Revised rating:\n";
+	rating[3].first() = "Bertie's Fab Eats";
+	rating[3].second() = 6;
+	cout << rating[3].second() << ":\t "
+		<< rating[3].first() << endl;
+	// std::cin.get();
+
+	// 
+	//
 	return 0;
 }
 

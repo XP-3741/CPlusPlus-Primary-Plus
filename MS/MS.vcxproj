@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{b34914f5-f87c-401f-be5e-0718f2c8d26f}</ProjectGuid>
-    <RootNamespace>第XIV章C中的代码重用</RootNamespace>
+    <ProjectGuid>{4b767e2d-148d-4316-a99d-84ae68c6706a}</ProjectGuid>
+    <RootNamespace>MS</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -139,21 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter_Fourteen.cpp" />
-    <ClCompile Include="studentc.cpp" />
-    <ClCompile Include="studenti.cpp" />
-    <ClCompile Include="Worker0.cpp" />
-    <ClCompile Include="workermi.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="arraytp.h" />
-    <ClInclude Include="pairs.h" />
-    <ClInclude Include="stacktp.h" />
-    <ClInclude Include="stcktp1.h" />
-    <ClInclude Include="studentc.h" />
-    <ClInclude Include="studenti.h" />
-    <ClInclude Include="Worker0.h" />
-    <ClInclude Include="workermi.h" />
+    <ClCompile Include="MS.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
