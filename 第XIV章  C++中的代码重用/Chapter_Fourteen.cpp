@@ -10,6 +10,7 @@
 #include"stcktp1.h"
 #include"arraytp.h"
 #include"pairs.h"
+#include"tempmemb.h"
 
 using std::cin;
 using std::cout;
@@ -499,8 +500,92 @@ int main()
 		<< rating[3].first() << endl;
 	// std::cin.get();
 
+	// 默认类型模板参数
+	//	类模板的另一项新特性,可以为类型参数提供默认值:
+	//		template<class T1, class T2 = int> class Topo {...}
+	//	这样,如果省略 T2 的值,编译器将使用 int
+	//	虽然可以为类模板类型参数提供默认值,但不能为函数模板参数提供默认值
+
+	// 模板具体化
+	//	类模板与函数模板很类似,因为可以有隐式实例化、显式实例化和显式具体化
+	//	统称为 具体化
+	//	模板以泛型的方式描述类,而具体化是使用具体的类型生成声明
+	//	- 隐式实例化
+	//		编译器在需要对象之前,不会生成类的隐式实例化:
+	//			ArrayTP<int, 100> stuff;		// a pointer, no object needed yet
+	//			stuff = new ArrayTP<int, 100>;	// now an object is needed
+	//		第二条语句导致编译器生成类定义,并根据该定义创建一个对象
+	//	- 显式实例化
+	//		当使用关键字 template 并指出所需类型来声明类时,编译器将生成类声明的显式实例化
+	//		声明必须位于模板定义所在的名称空间中
+	//		例如下面声明将 ArrayTP<string, 100> 声明为一个类:
+	//			template class ArrayTP<string, 100>;
+	//		在这种情况下,虽然没有创建或提及类对象,编译器也将生成类声明(包括方法定义)
+	//		和隐式实例化一样,也将根据通用模板来生成具体化
+	//	- 显式具体化
+	//		显式具体化是 特定类型(用于替换模板中的泛型) 的定义
+	//		可能需要在为特殊类型实例化时,对模板进行修改,使其行为不同
+	//		在这种情况下,可以创建显式具体化
+	//		具体化类模板定义的格式如下:
+	//			template <> class Classname<specilized-type-name> {...};
+	//		要使用新的表示法提供一个专供 const char *类型使用的 SortedArray 模板:
+	//			template <> class SortedArray<const char *>
+	//			{
+	//				...// details omitted
+	//			};
+	//		当请求 const char * 类型的 SortedArray 模板时
+	//		编译器将使用上述专用的定义,而不是通用的模板定义
+	//	- 部分具体化
+	//		即部分限制模板的通用性
+	//		例如,部分具体化可以给类型参数之一指定具体的类型:
+	//			// general template
+	//				template <class T1, class T2> class Pair {...};
+	//			// specialization with T2 set to int
+	//				template <class T1> class Pair<T1,int> {...};
+	//		关键字 template 后面的 <> 声明的是没有被具体化的类型参数
+	//		因此,上述第二个声明将 T2 具体化为 int,但 T1 保持不变
+	//		注意,如果指定所有的类型,则<>内将为空,这将导致显式具体化:
+	//			// specialization with T1 and T2 set to int
+	//				template <> class Pair<int,int> {...};
+	//		如果有多个模板可供选择,编译器将使用具体化程度最高的模板
+	//			Pair<double, double> p1;		// use general Pair template
+	//			Pair<double, int> p2;			// use Pair<T1,int> partial specialization
+	//			Pair<int, int> p3;				// use Pair<int,int> explicit specialization
+	//		也可以通过为指针提供特殊版本来部分具体化现有的模板:
+	//			template<class T>		// general version
+	//			class Feeb {...};
+	//			template<class T*>		// pointer partial specialization
+	//			class Feed {...};		// modified code
+	//		示例;
+	//			Feeb<char>fb1;			//	use general Feeb template, T is char
+	//			Feeb<char *>fb2;		//	use Feeb T* specialization, T is char
+	//		部分具体化特性使得能够设置各种限制:
+	//			// general template
+	//				template<class T1,class T2,class T3> class Trio{...};
+	//			// specialization with T3 set to T2
+	//				template<class T1,class T2> class Trio<T1,T2,T2>{...};
+	//			// specialization with T3 and T2 set to T1*
+	//				template<class T1> class Trio<T1,T1*,T1*>{...};
+	//		编译器会做出如下选择:
+	//			Trio<int,short,char *> t1;	// use general template
+	//			Trio<int,short> t2;			// use Trio<T1,T2,T2>
+	//			Trio<char,char*,char*> t3;	// use Trio<T1,T1*,T1*>
+
+	// 成员模板
+	//	模板可用作结构、类或模板类的成员
+	beta<double>guy(3.5, 3);
+	cout << "T was set to double\n";
+	guy.Show();
+	cout << "V was set to T, which is double, then V was set to int\n";
+	cout << guy.blab(10, 2.3) << endl;
+	cout << "U was set to int\n";
+	cout << guy.blab(10.0, 2.3) << endl;
+	cout << "U was set to double\n";
+	cout << "Done\n";
+	// std::cin.get();
+	//	blab()方法的 U 类型由该方法被调用时的参数值显示确定
 	// 
-	//
+
 	return 0;
 }
 
