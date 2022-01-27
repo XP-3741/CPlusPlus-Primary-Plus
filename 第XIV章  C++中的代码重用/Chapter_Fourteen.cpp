@@ -11,6 +11,8 @@
 #include"arraytp.h"
 #include"pairs.h"
 #include"tempmemb.h"
+#include"tempparm.h"
+#include"frnd2tmp.h"
 
 using std::cin;
 using std::cout;
@@ -584,7 +586,80 @@ int main()
 	cout << "Done\n";
 	// std::cin.get();
 	//	blab()方法的 U 类型由该方法被调用时的参数值显示确定
+	
+	// 将模板用作参数
+	//		template<template<typename T> class Thing>
+	//		class Crab
+	//	模板参数是 template<typename T> class Thing
+	//	其中 template<typename T> class 是类型,Thing 是参数
+	//	假设有如下声明:
+	//		Crab<King> legs;
+	//	为使上述声明被接受,模板参数King必须是一个模板类,其声明与模板参数Thing的声明匹配
+	//		template<typename T> class King {...};
+	Crab<Stack> nebula;
+// Stack must match template <typename T> class thing 
+	int ni;
+	double nb;
+	cout << "Enter int double pairs, such as 4 3.5 (0 0 to end):\n";
+	while (cin >> ni >> nb && ni > 0 && nb > 0)
+	{
+		if (!nebula.push(ni, nb))
+			break;
+	}
+	while (nebula.pop(ni, nb))
+		cout << ni << ", " << nb << endl;
+	cout << "Done.\n";
+	// 可以混合使用模板参数和常规参数
+	//		template<template<Typename> class Thing, typename U, typename V>
+	//		class Crab
+	//		{
+	//		...
+	//		private:
+	//			Thing<U> s1;
+	//			Thing<V> s2;
+	//		...
+	//		};
+	//	现在,成员s1和s2可存储的数据类型为泛型,而不是用硬编码指定的类型
+
+	// 模板类和友元
+	//	模板的友元分3类:
+	//		- 非模板友元
+	//		- 约束模板友元,即友元的类型取决于类被实例化时的类型
+	//		- 非约束模板友元,即友元的所有具体化都是类的每一个具体化的友元
 	// 
+	//	 模板类的非模板友元函数
+	//		在模板类中将一个常规函数声明为友元:
+	//		template<class T>
+	//		class HasFriend
+	//		{
+	//		public:
+	//			friend void counts();
+	//			...
+	//		};
+	//		上述声明使 counts() 函数称为模板所有实例化的友元
+	//		假设要为友元函数提供模板类参数
+	//		friend void counts(HasFriend &);
+	//		这样的声明是不可以的
+	//		原因是不存在 HasFriend 这样的对象,而只有特定的具体化:
+	//		friend void counts(HasFriend<T> &);
+	cout << "No objects declared: ";
+	counts();
+	HasFriend<int> hfil(10);
+	cout << "After hfi1 declared: ";
+	counts();
+	HasFriend<int> hfi2(20);
+	cout << "After hfi2 declared: ";
+	counts();
+	HasFriend<double> hfdb(10.5);
+	cout << "After hfdb declared: ";
+	counts();
+	reports(hfil);
+	reports(hfi2);
+	reports(hfdb);
+
+	// 模板类的约束模板友元函数
+	//	
+	//
 
 	return 0;
 }

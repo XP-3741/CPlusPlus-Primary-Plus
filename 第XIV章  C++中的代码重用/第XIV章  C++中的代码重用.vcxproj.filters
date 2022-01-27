@@ -59,5 +59,11 @@
     <ClInclude Include="tempmemb.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="tempparm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="frnd2tmp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
