@@ -13,6 +13,8 @@
 #include"tempmemb.h"
 #include"tempparm.h"
 #include"frnd2tmp.h"
+#include"tmp2tmp.h"
+#include"manyfrnd.h"
 
 using std::cin;
 using std::cout;
@@ -658,8 +660,69 @@ int main()
 	reports(hfdb);
 
 	// 模板类的约束模板友元函数
-	//	
-	//
+	//	为约束模板友元做准备,要使类的每个具体化都获得与友元匹配的具体化
+	//	分三步:
+	//		- 首先,在类定义的前面声明每个模板函数
+	//			template <typename T> void counts();
+	//			template <typename T> void reports(T &);
+	//		- 然后,在函数中再次将模板声明为友元,这些语句根据类模板参数的类型声明具体化
+	//			template <typename TT> class HasFriendT
+	//			{
+	//			...
+	//				friend void counts<TT>();
+	//				friend void reports<>(HasFriendT<TT> &);
+	//			};
+	//		  声明中的<>指出这是模板具体化
+	//		  对于report(),<>可以为空
+	//		  因为可以从函数参数推断出如下模板类型参数:
+	//			HasFriendT<TT>
+	//		  然而,也可以使用:
+	//			report<HasFriendT<TT> >(HasFriendT<TT> &)
+	//		  但 counts()函数没有参数,因此必须使用模板参数语法(<TT>)来指明其具体化
+	//		  还需要注意的是,TT 是 HasFriendT 类的参数类型
+	Counts<int>();
+	HasFriendT<int> hfi1(10);
+	HasFriendT<int> hfi2(20);
+	HasFriendT<double> hfib(10.5);
+	Report(hfi1);	// generate report(HasFriendT<int> &)
+	Report(hfi2);	// generate report(HasFriendT<int> &)
+	Report(hfib);	// generate report(HasFriendT<double> &)
+	cout << "counts<int>() output:\n";
+	Counts<int>();
+	cout << "counts<double>() output:\n";
+	Counts<double>();
+
+	// 模板类的非约束模板友元函数
+	//	通过在类内部声明模板,可以创建非约束友元函数,即每个函数具体化都是每个类具体化的友元
+	//	对于非约束友元,友元模板类型参数与模板类类型参数是不同的:
+	//		template<typename T> class ManyFriend
+	//		{
+	//		...
+	//			template<typename C, typename D> friend void show2(C &, D &);
+	//		};
+	ManyFriend<int> hfi1(10);
+	ManyFriend<int> hfi2(20);
+	ManyFriend<double> hfdb(10.5);
+	cout << "hfi1, hfi2: ";
+	show2(hfi1, hfi2);
+	cout << "hfdb, hfi2: ";
+	show2(hfdb, hfi2);
+
+	// 模板别名(C++11)
+	//  如果能为类型指定别名,将很方便,在模板设计中尤为如此
+	//  可使用 typedef 为模板具体化指定别名:
+	//	typedef std::array<double, 12> arrd;
+	//  C++11 新增了一项功能----使用模板提供一系列别名:
+	//		template<typename T>
+	//			using arraype = std::array<T,12>;
+	//	这将 arraypt 定义为一个模板别名,可使用他来指定类型:
+	//		arraype<double> gallons;
+	//	C++11 允许将语法 using = 用于非模板
+	//	用于非模板时,这种语法与常规 typedef 等价:
+	//		typedef const char * pc1;			// typedef syntax
+	//		using pc2 = const char *;			// using = syntax
+	//		typedef const int *(*pa1)[10];		// typedef syntax
+	//		using pa2 = const int *(*)[10];		// using = syntax
 
 	return 0;
 }

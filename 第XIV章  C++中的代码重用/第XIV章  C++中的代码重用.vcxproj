@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="arraytp.h" />
     <ClInclude Include="frnd2tmp.h" />
+    <ClInclude Include="manyfrnd.h" />
     <ClInclude Include="pairs.h" />
     <ClInclude Include="stacktp.h" />
     <ClInclude Include="stcktp1.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="studenti.h" />
     <ClInclude Include="tempmemb.h" />
     <ClInclude Include="tempparm.h" />
+    <ClInclude Include="tmp2tmp.h" />
     <ClInclude Include="Worker0.h" />
     <ClInclude Include="workermi.h" />
   </ItemGroup>

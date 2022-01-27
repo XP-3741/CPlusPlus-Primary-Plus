@@ -65,5 +65,11 @@
     <ClInclude Include="frnd2tmp.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="tmp2tmp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="manyfrnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
