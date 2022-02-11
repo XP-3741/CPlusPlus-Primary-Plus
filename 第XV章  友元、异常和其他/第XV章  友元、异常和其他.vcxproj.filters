@@ -18,9 +18,15 @@
     <ClCompile Include="Chapter_Fifteen.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="tv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tvfm.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
