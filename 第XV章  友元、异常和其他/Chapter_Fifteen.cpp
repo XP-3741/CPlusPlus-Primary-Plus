@@ -1,6 +1,7 @@
 #include<iostream>
 #include<cstdlib>		// abort()
 #include<cfloat>		// (or float.h) for DBL_MAX
+#include"exc_mean.h"
 
 void error1_cpp();
 double hmean(double a, double b);	// abort()测试
@@ -10,6 +11,11 @@ bool hmean(double a, double b, double* ans);	// 返回错误信息测试
 
 void error3_cpp();
 double hmean_throw(double a, double b);		// 异常机制测试
+
+void error4_cpp();
+double hmean_opp(double a, double b);
+double gmean_opp(double a, double b);		// 将对象用作异常类型测试
+
 
 int main()
 {
@@ -208,6 +214,24 @@ int main()
 	//		直到找到包含 try 块的函数
 	//		另外,在这个例子中, throw 将程序控制权返回给 error3_cpp()
 	//		程序将在 error3_cpp() 中寻找与引发的异常类型匹配的异常处理程序(位于 try 块后面)
+	//		catch 块点类似于函数定义,但并不是函数定义
+	//		关键字 catch 表明这是一个处理程序,而 char* 则表明该处理程序与字符串异常匹配
+	//		s与函数参数定义极其类似,一位内匹配的引发将被赋给s
+	//		另外,当异常与该处理程序匹配时,程序将执行括号中的代码
+	//		执行完 try 块的语句后,如果没有引发任何异常,则程序跳过 try 块后面的 catch 块
+	//		直接执行处理程序后面的第一条语句
+	//		如果函数引发了异常,而没有 try 块或没有匹配的处理程序
+	//		在默认情况下,程序最终将调用 abort() 函数,但可以修改这种行为
+	// 
+	// 将对象用作异常类型
+	//		通常,引发异常的函数将传递一个对象
+	//		这样做的优点之一是,可以使用不同的异常类型来区分不同函数在不同情况下引发的异常
+	//		另外,对象可以携带信息,程序员可以更具这些信息来确定引发异常的原因
+	//		同时,catch 块可以根据这些信息来决定采取什么样的措施
+	if (WhichOne == 4)error4_cpp();
+	//		C++11 只吃一种特殊的异常规范:使用新增的关键字 noexcept 指出函数不会引发异常"
+	//		double marn() noexcept;
+	//		通过使用这个关键字,编写函数的程序员相当于做出了承若
 	//
 	return 0;
 }
@@ -291,4 +315,53 @@ double hmean_throw(double a, double b)
 	if (a = -b)
 		throw"bad hmean() arguments: a = -b not allowed";
 	return 2.0 * a * b / (a + b);
+}
+
+void error4_cpp()
+{
+	using std::cout;
+	using std::cin;
+	using std::endl;
+
+	double x, y, z;
+
+	cout << "Enter two numbers: ";
+	while (cin >> x >> y)
+	{
+		try {						// start of try block
+			z = hmean_opp(x, y);
+			cout << "Harmonic mean of " << x << " and " << y
+				<< " is " << z << endl;
+			cout << "Geometric mean of " << x << " and " << y
+				<< " is " << gmean_opp(x, y) << endl;
+			cout << "Enter next set of numbers <q to quit>: ";
+		}// end of try block
+		catch (bad_hmean& bg)		// start of catch block
+		{
+			bg.mesg();
+			cout << "Try again.\n";
+			continue;
+		}
+		catch (bad_gmean& hg)
+		{
+			cout << hg.mesg();
+			cout << "Values used: " << hg.v1 << ", "
+				<< hg.v2 << endl;
+			cout << "Sorry, you don't get to play any more.\n";
+			break;
+		}// end of catch block
+	}
+	cout << "Bye!\n";
+}
+double hmean_opp(double a, double b)
+{
+	if (a == -b)
+		throw bad_hmean(a, b);
+	return 2.0 * a * b / (a + b);
+}
+double gmean_opp(double a, double b)
+{
+	if (a < 0 || b < 0)
+		throw bad_gmean(a, b);
+	return std::sqrt(a * b);
 }

@@ -143,6 +143,7 @@
     <ClCompile Include="tv.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="exc_mean.h" />
     <ClInclude Include="queuetp.h" />
     <ClInclude Include="tv.h" />
     <ClInclude Include="tvfm.h" />
