@@ -1,6 +1,9 @@
 #include<iostream>
 #include<cstdlib>		// abort()
 #include<cfloat>		// (or float.h) for DBL_MAX
+#include<cmath>			// or math.h, unix users may need -lm flag
+#include<string>
+#include<exception>
 #include"exc_mean.h"
 
 void error1_cpp();
@@ -15,6 +18,29 @@ double hmean_throw(double a, double b);		// 异常机制测试
 void error4_cpp();
 double hmean_opp(double a, double b);
 double gmean_opp(double a, double b);		// 将对象用作异常类型测试
+
+void error5_cpp();
+double means(double a, double b);
+
+class demo
+{
+private:
+	std::string word;
+public:
+	demo(const std::string& str)
+	{
+		word = str;
+		std::cout << "demo " << word << " created\n";
+	}
+	~demo()
+	{
+		std::cout << "demo " << word << " destroyed\n";
+	}
+	void show() const
+	{
+		std::cout << "demo " << word << " lives!\n";
+	}
+};
 
 
 int main()
@@ -232,10 +258,57 @@ int main()
 	//		C++11 只吃一种特殊的异常规范:使用新增的关键字 noexcept 指出函数不会引发异常"
 	//		double marn() noexcept;
 	//		通过使用这个关键字,编写函数的程序员相当于做出了承若
+	// 
+	// 栈解退
+	//		假设 try 块没有直接调用引发异常的函数,而是调用了对引发异常的函数进行调用的函数
+	//		则程序流程将从引发异常的函数跳到包含 try 块和处理程序的函数,这涉及到栈解退
+	//		
+	//		首先看一看 C++ 通常是如何处理函数调用和返回的
+	//		C++通常通过将信息放到栈中来处理函数调用
+	//		具体地说,程序将调用函数的指令的地址(返回地址)放到栈中
+	//		当被调用的函数执行完毕后,程序将使用该地址来确定从哪里开始继续执行
+	//		另外,函数调用将函数参数放到栈中
+	//		在栈中,这些函数参数被视为自动变量
+	//		如果被调用的函数创建新的自动变量,则这些变量也将被添加到栈中
+	//		如果被调用的函数调用了另一个函数,则后者的信息将被添加到栈中,以此类推
+	//		当函数结束时,程序流程将跳到该函数被调用时存储的地址处,同时栈顶的元素被释放
+	//		因此,函数通常都返回到调用它的函数,以此类推
+	//		同时每个函数都在结束时释放其自动变量
+	//		如果自动变量是类对象,则类的析构函数(如果有的话)将被调用
+	//		现在假设函数由于出现异常(而不是由于返回)而终止
+	//		则程序也将释放栈中的内存,但不会在释放栈的第一个返回地址后停止
+	//		而是继续释放,直到找到一个位于 try 块中的返回地址
+	//		随后,控制权将转到块尾的异常处理程序,而不是函数调用后面的第一条语句
+	//		这个过程被称为 栈解退
+	//		引发机制的一个非常重要的特性是,和函数返回一样,对于栈中的自动类对象
+	//		类的析构函数将被调用
+	//		然而,函数返回仅仅处理该函数放在栈中的对象,而 throw 语句则处理 try 块和 throw 之前
+	//		整个函数调用序列放在栈中的对象
+	//		如果没有栈解退这种特性,则引发异常后,对于中间函数调用放在栈中的自动类对象
+	//		其析构函数不会被调用
+	WhichOne = 5;
+	if (WhichOne == 5)error5_cpp();
+	//		当不知道被调用的函数可能引发哪些异常
+	//		在这种情况下,仍能够捕捉异常,即使不知道异常的类型
+	//		方法是使用省略号来表示异常类型
+	//		从而捕捉任何异常
+	//		catch(...)
+	//		可将其放在所有异常 catch 块的后面
+	//		类似于 switch 中的 default
+	// 
+	//  exception 类
+	//		较新的C++编译器将异常合并到语言中
+	//		例如,为支持该语言,exception 头文件定义了 exception 类
+	//		有一个名为 what() 的虚拟成员函数,它返回一个字符串
+	//		该字符串的特征随实现而异
+	//		然而,由于这是一个虚方法,因此可以从 exception 派生而来的类中重新定义
+	//		
 	//
+
 	return 0;
 }
 
+// error1.cpp
 void error1_cpp()
 {
 	double x, y, z;
@@ -259,6 +332,7 @@ double hmean(double a, double b)
 	return 2.0 * a * b / (a + b);
 }
 
+// error2.cpp
 void error2_cpp()
 {
 	double x, y, z;
@@ -288,6 +362,7 @@ bool hmean(double a, double b,double * ans)
 	}
 }
 
+// error3.cpp
 void error3_cpp()
 {
 	double x, y, z;
@@ -317,6 +392,7 @@ double hmean_throw(double a, double b)
 	return 2.0 * a * b / (a + b);
 }
 
+// error4.cpp
 void error4_cpp()
 {
 	using std::cout;
@@ -364,4 +440,71 @@ double gmean_opp(double a, double b)
 	if (a < 0 || b < 0)
 		throw bad_gmean(a, b);
 	return std::sqrt(a * b);
+}
+
+// error5.cpp
+void error5_cpp()
+{
+	using std::cout;
+	using std::cin;
+	using std::endl;
+
+	double x, y, z;
+	{
+		demo d1("found in block in error5_cpp()");
+		cout << "Enter two numbers: ";
+		while (cin >> x >> y)
+		{
+			try {
+				z = means(x, y);
+				cout << "The mean mean of " << x << " and " << y
+					<< " is " << z << endl;
+				cout << "Enter next pair: ";
+			}
+			catch (bad_hmean& bg)		// bg 指向的是发生异常对象的副本
+			{							// 使用引用的目的:基类引用可以执行派生类对象
+										// 引发的异常对象将被第一个与之匹配的 catch 捕捉
+										// 这意味着 catch 块的排列顺序应该与派生顺序相反
+				bg.mesg();
+				cout << "Try again.\n";
+				continue;
+			}
+			catch (bad_gmean& hg)
+			{
+				cout << hg.mesg();
+				cout << "Values used: " << hg.v1 << ", "
+					<< hg.v2 << endl;
+				cout << "Sorry, you don't get to play any more.\n";
+				break;
+					// 如果 catch 块使用的是 exit(EXIT_FAILURE)而不是 break
+					// 则程序将立即终止,用户将看不到下面 d1.show() 的输出
+					// 但仍能够看到 d1 调用析构函数的输出
+			}
+			catch (...)
+			{
+				cout << "DEFAULT";
+			}
+		}
+		d1.show();
+	}
+	cout << "Bye!\n";
+}
+
+double means(double a, double b)
+{
+	double am, hm, gm;
+	demo d2("found in means()");
+	am = (a + b) / 2.0;
+	try {
+		hm = hmean_opp(a, b);
+		gm = gmean_opp(a, b);
+	}
+	catch (bad_hmean& bg)
+	{
+		bg.mesg();
+		std::cout << "Caught in means()\n";
+		throw;             // rethrows the exception 
+	}
+	d2.show();
+	return (am + hm + gm) / 3.0;
 }
