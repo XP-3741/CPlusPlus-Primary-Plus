@@ -1,9 +1,10 @@
 #include<iostream>
-#include<cstdlib>		// abort()
+#include<cstdlib>		// abort(),exit() EXIT_FAILURE
 #include<cfloat>		// (or float.h) for DBL_MAX
 #include<cmath>			// or math.h, unix users may need -lm flag
 #include<string>
 #include<exception>
+#include<new>			// for bad_alloc
 #include"exc_mean.h"
 
 void error1_cpp();
@@ -20,7 +21,9 @@ double hmean_opp(double a, double b);
 double gmean_opp(double a, double b);		// 将对象用作异常类型测试
 
 void error5_cpp();
-double means(double a, double b);
+double means(double a, double b);			// throw 和 return 区别测试
+
+void newexcp_cpp();
 
 class demo
 {
@@ -40,6 +43,11 @@ public:
 	{
 		std::cout << "demo " << word << " lives!\n";
 	}
+};
+
+struct Big
+{
+	double stuff[20000];
 };
 
 
@@ -286,7 +294,6 @@ int main()
 	//		整个函数调用序列放在栈中的对象
 	//		如果没有栈解退这种特性,则引发异常后,对于中间函数调用放在栈中的自动类对象
 	//		其析构函数不会被调用
-	WhichOne = 5;
 	if (WhichOne == 5)error5_cpp();
 	//		当不知道被调用的函数可能引发哪些异常
 	//		在这种情况下,仍能够捕捉异常,即使不知道异常的类型
@@ -302,7 +309,42 @@ int main()
 	//		有一个名为 what() 的虚拟成员函数,它返回一个字符串
 	//		该字符串的特征随实现而异
 	//		然而,由于这是一个虚方法,因此可以从 exception 派生而来的类中重新定义
-	//		
+	//		C++库定义了很多基于 exception 的异常类型
+	//			1.stdexcept 异常类
+	//			 头文件 stdexcept 定义了其他几个异常类
+	//			 首先,该文件定义了 logic_error 和 runtime_error 类
+	//			 它们都以公有方式 exception 派生而来(P632)
+	//				logic_error 的派生类:
+	//					异常 invalid_argument 指出函数传递了一个意料之外的值
+	//					异常 length_error 指出没有足够的空间来执行所需要的操作
+	//					异常 out_of_bounds 通常用于指示索引错误
+	//					...
+	//				runtime_error 的派生类:
+	//					异常 range_error 
+	//					异常 overflow_error 
+	//					异常 underflow_error 
+	//			2.bad_alloc 异常和 new
+	//				对于使用 new 导致的内存分配问题,C++的最新处理方式是让 new 引发 bad_alloc 异常
+	//				头文件 new 包含 bad_alloc 类声明
+	//				它从 exception 类公有派生而来的
+	if (WhichOne == 6)newexcp_cpp();
+	//			3.空指针和 new
+	//				C++标准提供了一个再失败时返回空指针的 new
+	//				int * pi = new (std::nothrow) int;
+	//				int * pa = new (std::nowthrow) int[500];
+	//				则可将 newexcp_cpp() 核心代码改成如下:
+	//				pb = new (std::nothrow) Big[13000];
+	//				if(pb == 0)
+	//				{
+	//					cout << "Caught not allocate memory. Bye.\n";
+	//					exit(EXIT_FAILURE);
+	//				}
+	// 
+	// 异常、类和继承
+	//		异常、类和继承以三种方式相互关联
+	//		首先,可以像标准C++库所做的那样,从一个异常类派生出另一个
+	//		其次,可以在类定义中嵌套异常类声明来组合异常
+	//		第三,这种嵌套声明本身可被继承,还可用作基类
 	//
 
 	return 0;
@@ -507,4 +549,26 @@ double means(double a, double b)
 	}
 	d2.show();
 	return (am + hm + gm) / 3.0;
+}
+
+// newexcp.cpp
+void newexcp_cpp()
+{
+	using namespace std;
+	Big* pb;
+	try {
+		cout << "Trying to get a big block of memory:\n";
+		pb = new Big[13000];
+		cout << "Got past the new request:\n";
+	}
+	catch (bad_alloc& ba)
+	{
+		cout << "Caught the exception!\n";
+		cout << ba.what() << endl;
+		exit(EXIT_FAILURE);
+	}
+	cout << "Memory successfully allocated\n";
+	pb[0].stuff[0] = 4;
+	cout << pb[0].stuff[0] << endl;
+	delete[] pb;
 }
