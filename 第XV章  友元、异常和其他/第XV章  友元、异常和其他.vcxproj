@@ -140,11 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Chapter_Fifteen.cpp" />
+    <ClCompile Include="sales.cpp" />
     <ClCompile Include="tv.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="exc_mean.h" />
     <ClInclude Include="queuetp.h" />
+    <ClInclude Include="sales.h" />
     <ClInclude Include="tv.h" />
     <ClInclude Include="tvfm.h" />
   </ItemGroup>

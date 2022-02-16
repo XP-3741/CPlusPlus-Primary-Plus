@@ -21,6 +21,9 @@
     <ClCompile Include="tv.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="sales.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tv.h">
@@ -33,6 +36,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="exc_mean.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sales.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

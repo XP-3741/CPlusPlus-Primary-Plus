@@ -6,6 +6,7 @@
 #include<exception>
 #include<new>			// for bad_alloc
 #include"exc_mean.h"
+#include"sales.h"
 
 void error1_cpp();
 double hmean(double a, double b);	// abort()测试
@@ -24,6 +25,8 @@ void error5_cpp();
 double means(double a, double b);			// throw 和 return 区别测试
 
 void newexcp_cpp();
+
+void use_sales_cpp();
 
 class demo
 {
@@ -345,7 +348,8 @@ int main()
 	//		首先,可以像标准C++库所做的那样,从一个异常类派生出另一个
 	//		其次,可以在类定义中嵌套异常类声明来组合异常
 	//		第三,这种嵌套声明本身可被继承,还可用作基类
-	//
+	WhichOne = 7;
+	if (WhichOne == 7)use_sales_cpp();
 
 	return 0;
 }
@@ -571,4 +575,80 @@ void newexcp_cpp()
 	pb[0].stuff[0] = 4;
 	cout << pb[0].stuff[0] << endl;
 	delete[] pb;
+}
+
+// use_sales.cpp
+void use_sales_cpp()
+{
+	using std::cout;
+	using std::cin;
+	using std::endl;
+
+	double vals1[12] =
+	{
+		1220, 1100, 1122, 2212, 1232, 2334,
+		2884, 2393, 3302, 2922, 3002, 3544
+	};
+
+	double vals2[12] =
+	{
+		12, 11, 22, 21, 32, 34,
+		28, 29, 33, 29, 32, 35
+	};
+
+	Sales sales1(2011, vals1, 12);
+	LabelSales sales2("Blogstar", 2012, vals2, 12);
+
+	cout << "First try block:\n";
+	try {
+		int i;
+		cout << "Year = " << sales1.Year() << endl;
+		for (i = 0; i < 12; ++i)
+		{
+
+			cout << sales1[i] << ' ';
+			if (i % 6 == 5)
+				cout << endl;
+		}
+		cout << "Year = " << sales2.Year() << endl;
+		cout << "Label = " << sales2.Label() << endl;
+		for (i = 0; i <= 12; ++i)
+		{
+
+			cout << sales2[i] << ' ';
+			if (i % 6 == 5)
+				cout << endl;
+		}
+		cout << "End of try block 1.\n";
+	}
+	catch (LabelSales::nbad_index& bad)
+	{
+		cout << bad.what();
+		cout << "Company: " << bad.label_val() << endl;
+		cout << "bad index: " << bad.bi_val() << endl;
+	}
+	catch (Sales::bad_index& bad)
+	{
+		cout << bad.what();
+		cout << "bad index: " << bad.bi_val() << endl;
+	}
+	cout << "\nNext try block:\n";
+	try
+	{
+		sales2[2] = 37.5;
+		sales1[20] = 23345;
+		cout << "End of try block 2.\n";
+	}
+	catch (LabelSales::nbad_index& bad)
+	{
+		cout << bad.what();
+		cout << "Company: " << bad.label_val() << endl;
+		cout << "bad index: " << bad.bi_val() << endl;
+	}
+	catch (Sales::bad_index& bad)
+	{
+		cout << bad.what();
+		cout << "bad index: " << bad.bi_val() << endl;
+	}
+	cout << "done\n";
 }
