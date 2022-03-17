@@ -350,6 +350,9 @@ int main()
 	//		第三,这种嵌套声明本身可被继承,还可用作基类
 	WhichOne = 7;
 	if (WhichOne == 7)use_sales_cpp();
+	// 异常合适会迷失方向
+	//		
+	//
 
 	return 0;
 }
