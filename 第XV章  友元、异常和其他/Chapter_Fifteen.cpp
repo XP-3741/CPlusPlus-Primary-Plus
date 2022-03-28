@@ -7,6 +7,7 @@
 #include<new>			// for bad_alloc
 #include"exc_mean.h"
 #include"sales.h"
+#include"rtti1.h"
 
 void error1_cpp();
 double hmean(double a, double b);	// abort()测试
@@ -186,7 +187,7 @@ int main()
 	// 嵌套类和访问权限
 	//	嵌套类的声明位置确定了嵌套类的作用域
 	//		即它决定了程序的哪些部分可以创建这种类的对象
-	//	其次,和其它类一样,嵌套类的共有部分、保护部分和私有部分控制了对类成员的访问
+	//	其次,和其它类一样,嵌套类的公有部分、保护部分和私有部分控制了对类成员的访问
 	// 
 	//  -作用域
 	//		如果嵌套类是在另一个类的私有部分声明的,则只有后者知道它
@@ -247,7 +248,7 @@ int main()
 	//		关键字 try 后面是一个由花括号括起的代码块,表明需要注意这些代码引发的异常
 	if (WhichOne == 3)error3_cpp();
 	//		执行 throw 语句类似于执行返回语句,因为它也将终止函数的执行
-	//		但 throw 不是讲控制权返回给调用程序,而是导致程序沿函数调用序列后退
+	//		但 throw 不是将控制权返回给调用程序,而是导致程序沿函数调用序列后退
 	//		直到找到包含 try 块的函数
 	//		另外,在这个例子中, throw 将程序控制权返回给 error3_cpp()
 	//		程序将在 error3_cpp() 中寻找与引发的异常类型匹配的异常处理程序(位于 try 块后面)
@@ -266,7 +267,7 @@ int main()
 	//		另外,对象可以携带信息,程序员可以更具这些信息来确定引发异常的原因
 	//		同时,catch 块可以根据这些信息来决定采取什么样的措施
 	if (WhichOne == 4)error4_cpp();
-	//		C++11 只吃一种特殊的异常规范:使用新增的关键字 noexcept 指出函数不会引发异常"
+	//		C++11 支持一种特殊的异常规范:使用新增的关键字 noexcept 指出函数不会引发异常"
 	//		double marn() noexcept;
 	//		通过使用这个关键字,编写函数的程序员相当于做出了承若
 	// 
@@ -332,7 +333,7 @@ int main()
 	//				它从 exception 类公有派生而来的
 	if (WhichOne == 6)newexcp_cpp();
 	//			3.空指针和 new
-	//				C++标准提供了一个再失败时返回空指针的 new
+	//				C++标准提供了一个在失败时返回空指针的 new
 	//				int * pi = new (std::nothrow) int;
 	//				int * pa = new (std::nowthrow) int[500];
 	//				则可将 newexcp_cpp() 核心代码改成如下:
@@ -348,10 +349,57 @@ int main()
 	//		首先,可以像标准C++库所做的那样,从一个异常类派生出另一个
 	//		其次,可以在类定义中嵌套异常类声明来组合异常
 	//		第三,这种嵌套声明本身可被继承,还可用作基类
-	WhichOne = 7;
 	if (WhichOne == 7)use_sales_cpp();
 	// 异常合适会迷失方向
-	//		
+	//		P640	未懂
+	
+	// RTTI
+	//		RTTI 是运行阶段类型识别(Runtime Type Identification)的简称
+	//		RTTI 旨在为程序在运行阶段确定对象的类型提供一种标准方式
+	// RTTI的工作原理
+	//		C++有3种支持 RTTI 的元素
+	//		- 如果可能的话,dynamic_cast 运算符将使用一个指向基类的指针来生成一个指向派生类的指针
+	//		否则,该运算符返回0——空指针
+	//		- typeid 运算符返回一个指出对象的类型的值
+	//		- type_info 结构存储了有关特定类型的信息
+	//		只能将 RTTI 用于包含虚函数的类层次结构,原因在于只有对于
+	//		这种类层次结构,才应该将派生类对象的地址赋给基类指针
+	//		警告:RTTI只适用于包含虚函数的类
+	// 下面详细介绍 RTTI 的这 3 个元素
+	//		1.dynamic_cast 运算符
+	//			dynamic_cast是最常见的 RTTI 组件
+	//			他不能回答"指针指向的是哪类对象"这样的问题
+	//			但能够回答"是否可以安全将对象的地址赋给特定类型的指针"这样的问题
+	//			假设有下面这样的类层次结构:
+	//				class Grand { // has virtual methods };
+	//				class Superb : public Grand { ... };
+	//				class Magnificent : public Superb { ... };
+	//			接下来假设有下面的指针:
+	//				Grand* pg = new Grand;
+	//				Grand* ps = new Superb;
+	//				Grand* pm = new Magnificent;
+	//			最后,对于下面的类型转换:
+	//				Magnificent* p1 = (Magnificent*) pm;	// #1
+	//				Magnificent* p2 = (Magnificent*) pg;	// #2
+	//				Superb* p3 = (Magnificent*) pm;			// #3
+	//			#1和#3是安全的,#2是不安全的
+	//			注意,与问题"指针指向的是哪类对象"相比,问题"类型转换是否安全",更通用也更有用
+	//			通常想知道类型的原因在于:知道类型后,就可以知道调用特定的方法是否安全
+	//			要调用方法,类型并不一定要完全匹配,而可以是定义了方法的虚函数版本的基类类型
+	//			下面的例子说明了这一点
+	//			先看一下 dynamic_cast 的语法
+	//				Superb* pm = dynamic_cast<Superb*>(pg);
+	//			指针 pg 的类型如果可以被安全地转换为 Superb*,运算符返回对象的地址
+	//			否则返回一个空指针
+	//			通常,如果指向的对象(*pt)的类型为 Type 或者是从 Type 直接或间接
+	//			派生而来的类型,则下面的表达式将指针 pt 转换为 Type 类型的指针:
+	//				dynamic_cast<Type*>(pt)
+	//			否则,结果为0,即空指针
+	if (WhichOne == 8)	rtti1_main();
+	//			注意:即使编译器支持 RTTI ,在默认情况下,它也可能关闭该特性	
+	//			如果该特性被关闭,程序可能仍能够通过编译,但将出现运行阶段的错误
+	//			在这种请况下,应查看文档或菜单选项
+	//			也可将 dynamic_cast 用作引用,其用法稍微有点不同
 	//
 
 	return 0;

@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="exc_mean.h" />
     <ClInclude Include="queuetp.h" />
+    <ClInclude Include="rtti1.h" />
     <ClInclude Include="sales.h" />
     <ClInclude Include="tv.h" />
     <ClInclude Include="tvfm.h" />
