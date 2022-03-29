@@ -5,9 +5,11 @@
 #include<string>
 #include<exception>
 #include<new>			// for bad_alloc
+#include<typeinfo>		// for bad_cast
 #include"exc_mean.h"
 #include"sales.h"
 #include"rtti1.h"
+#include"rtti2.h"
 
 void error1_cpp();
 double hmean(double a, double b);	// abort()测试
@@ -399,7 +401,84 @@ int main()
 	//			注意:即使编译器支持 RTTI ,在默认情况下,它也可能关闭该特性	
 	//			如果该特性被关闭,程序可能仍能够通过编译,但将出现运行阶段的错误
 	//			在这种请况下,应查看文档或菜单选项
-	//			也可将 dynamic_cast 用作引用,其用法稍微有点不同
+	//			也可将 dynamic_cast 用作引用,其用法稍微有点不同:
+	//			没有与空指针对应的引用值,因此无法使用特殊的引用值来指示失败
+	//			当请求不正确时,dynamic_cast 将引发类型为 bad_cast 的异常
+	//			这种异常是从 exception 类派生而来的
+	//			它在头文件 typeinof 中定义
+	//			因此,可以像下面这样使用该运算符,其中 rg 是对 Grand 对象的引用:
+	try {
+		// Superb& rs = dynamic_cast<Superb&>(rg);
+		// ...
+	}
+	catch (std::bad_cast &) {
+		// ...
+	}
+	//		2.typeid 运算符和 type_info 运算符
+	//			typeid 运算符使得能否确定两个对象是否为同种类型
+	//			它与 sizeof 有些相像,可以接受两种参数:
+	//				- 类名
+	//				- 结果为对象的表达式
+	//			typeid 运算符返回一个对 type_info 对象的引用
+	//			其中, type_info 在头文件 typeinfo(以前为 typeinfo.h)中定义的一个类
+	//			type_info 类重载了 == 和 != 运算符,以便可以使用这些运算符来对类型进行比较
+	//			例如,如果 pg 指向的是一个 Magnificent 对象
+	//			则下述表达式的结果为 bool 值 true,否则为 false:
+	//				typeid(Magnificent) == typeid(*pg)
+	//			如果 pg 是一个空指针,程序将引发 bad_typeid 的异常
+	//			该异常是从 exception 类派生而来的,是在头文件 typeinfo 中声明的
+	//			type_info 类的实现随厂商而异,但包含一个 name() 成员
+	//			该函数返回一个随实现而异的字符串: 通常(但并非一定)是类的名称
+	//			例如,下面的语句显示指针 pg 指向的对象所属的类定义的字符串:
+	//				cout << "Now processing type " << typeid(*pg).name() << ".\n";
+	if (WhichOne == 9)	rtti2_main();
+	//			提示: 如果发现在扩展的 ifelse 语句系列使用了 typeid,
+	//				则应考虑是否应该使用虚函数和 denamic_cast
+	// 
+	//	类型转换运算符
+	//		C++ 采用相比 C 更严格地限制允许的类型转换:
+	//			- dynamic_cast
+	//			- const_cast
+	//			- static_cast
+	//			- reinterpret_cast
+	//		可以根据目的的选择一个合适的运算符,而不是使用通用的类型转换
+	//		这指出了进行类型转换的原因.并让编译器能够检查程序的行为是否与设计者想法吻合
+	//		1.dynamic_cast 运算符
+	//			已经在前面介绍过了
+	//			总之,假设 High 和 Low 是两个类,而 ph 和 pl 的类型分别为 High* 和 Low*
+	//			则仅当 Low 是 High 的可访问基类(直接或间接)时
+	//			下面的语句才将一个 Low* 指针赋给 pl:
+	//				pl = dynamic_cast<Low *> ph;
+	//			否则,该语句将空指针赋给 pl. 通常,该运算符的语法如下:
+	//				dynamic_cast < type-name > (expression)
+	//			该运算符用途是,使得能够在类层次结构中进行向上转换
+	//			(由于是 is-a 关系,这样的类型转换时安全的),而不允许其他转换
+	//		2.const_cast 运算符
+	//			用于执行只有一种用途的类型转换,即改变值为 const 或 volatile
+	//			其语法与 dynamic_cast 相同;
+	//				const_cast < type-name > (expression)
+	//			如果类型的其他方面也被修改,则上述类型转换将出错
+	//			也就是说,除了 const 或 volatile 特征(有或无)可以不同外
+	//			type-name 和 expression 的类型必须相同
+	//			再次假设 High 和 Low 是两个类:
+	//				High bar;
+	//				const High* pbar = & bar;
+	//					...
+	//				High* pb = const_cast<High *>(pbar);		// valid
+	//				const Low* pl = const_cast<const Low*> (pbar);		// invalid
+	//			第一个类型转换使得 *pb 成为一个可用于修改 bar 对象值的指针,他删除了 const 标签
+	//			第二个类型转换是非法的,因为它同时尝试将类型从 const High* 修改为 const Low*
+	//			提供该运算符的原因是,有时候可能需要这样一个值,他在大多情况下是常量
+	//			而有时有时可以修改的,在这种情况下,可以将这个值声明为 const
+	//			并在需要修改它的时候,使用 const_cast
+	//			这也可以通过通用类型转换来实现,但通用转换也可能同时改变类型:
+	//				High bar;
+	//				const High* pbar = &bar;
+	//					...
+	//				High* pb = (High*)(pbar);		// valid
+	//				Low* pl = (Low*)(pbar);			// invalid
+	//			由于编程时可能无意间同时改变类型和常量特征,因此使用 const_cast 运算符更安全
+	//			const_cast 不是万能的,它可以修改指向一个值的指针,但修改 const 值的结果是不确定的
 	//
 
 	return 0;

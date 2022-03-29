@@ -22,9 +22,7 @@ public:
 	Superb(int h = 0) :Grand(h) {}
 	void Speak() const { cout << "I am a superb class!!\n"; }
 	virtual void Say() const
-	{
-		cout << "I hold the superb value of " << Value() << "!\n";
-	}
+		{cout << "I hold the superb value of " << Value() << "!\n";}
 };
 
 class Magnificent :public Superb
