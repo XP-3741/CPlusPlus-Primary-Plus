@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31911.196
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "第XIII章  类继承", "第XIII章  类继承\第XIII章  类继承.vcxproj", "{8ABFF84F-B83F-45B6-95B9-0147F7ED0552}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MS", "MS\MS.vcxproj", "{4B767E2D-148D-4316-A99D-84AE68C6706A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "第XV章  友元、异常和其他", "第XV章  友元、异常和其他\第XV章  友元、异常和其他.vcxproj", "{487D949D-9270-4380-AECC-CF92AB7732E8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "第XVI章 string类和标准模板库", "第XVI章 string类和标准模板库\第XVI章 string类和标准模板库.vcxproj", "{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,6 +123,14 @@ Global
 		{487D949D-9270-4380-AECC-CF92AB7732E8}.Release|x64.Build.0 = Release|x64
 		{487D949D-9270-4380-AECC-CF92AB7732E8}.Release|x86.ActiveCfg = Release|Win32
 		{487D949D-9270-4380-AECC-CF92AB7732E8}.Release|x86.Build.0 = Release|Win32
+		{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}.Debug|x64.ActiveCfg = Debug|x64
+		{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}.Debug|x64.Build.0 = Debug|x64
+		{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}.Debug|x86.ActiveCfg = Debug|Win32
+		{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}.Debug|x86.Build.0 = Debug|Win32
+		{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}.Release|x64.ActiveCfg = Release|x64
+		{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}.Release|x64.Build.0 = Release|x64
+		{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}.Release|x86.ActiveCfg = Release|Win32
+		{4577E085-A35C-446C-9ED7-5DCCC6E0E16C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

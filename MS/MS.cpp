@@ -1,9 +1,105 @@
 #include<iostream>
 #include<vector>
+#include<stack>
+#include<algorithm>
 using std::cin;
 using std::cout;
 using std::endl;
 using std::vector;
+
+std::stack<int>right;
+std::stack<int>left;
+vector<int>Nsums;
+
+struct TreeNode {
+	int val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode() : val(0), left(nullptr), right(nullptr) {}
+	TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+	TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
+};
+
+int addVector(TreeNode* root);
+bool isValidBST(TreeNode* root, int& theSum);
+int addAllSums(TreeNode* root);
+
+int maxSumBST(TreeNode* root) {
+	int theSum = 0;
+	if (isValidBST(root, theSum)) {
+		int anotherSum = addAllSums(root);
+		Nsums.clear();
+		if (anotherSum > theSum)   return anotherSum;
+		return theSum;
+	}
+	else {
+		while (!right.empty())   right.pop();
+		while (!left.empty())   left.pop();
+		int Lsum = 0;
+		int Rsum = 0;
+		if (root->left)  Lsum = maxSumBST(root->left);
+		if (root->right) Rsum = maxSumBST(root->right);
+		if (Lsum > Rsum)   return Lsum;
+		else    return Rsum;
+	}
+}
+
+bool isValidBST(TreeNode* root, int& theSum) {
+	if (root->right) {
+		right.push(root->val);
+		if (root->val >= root->right->val)  return false;
+		else if (!left.empty() && root->right->val >= left.top())    return false;
+		else if (!isValidBST(root->right, theSum))   return false;
+		right.pop();
+	}
+	if (root->left) {
+		left.push(root->val);
+		if (root->val <= root->left->val)   return false;
+		else if (!right.empty() && root->left->val <= right.top())    return false;
+		else if (!isValidBST(root->left, theSum))    return false;
+		left.pop();
+	}
+	theSum += root->val;
+	return true;
+}
+
+int addAllSums(TreeNode* root)
+{
+	if (root->left)  addVector(root->left);
+	if (root->right)  addVector(root->right);
+	if (Nsums.empty())   return 0;
+	sort(Nsums.begin(), Nsums.end());
+	return Nsums[Nsums.size() - 1];
+}
+
+int addVector(TreeNode* root)
+{
+	if (!root->right && !root->left) { Nsums.push_back(root->val); return root->val; }
+	else {
+		int RightSum = 0;
+		int LeftSum = 0;
+		if (root->right) RightSum += addVector(root->right);
+		if (root->left)  LeftSum += addVector(root->left);
+		Nsums.push_back(RightSum + LeftSum + root->val);
+		return RightSum + LeftSum + root->val;
+	}
+}
+
+int main()
+{
+	TreeNode* root8 = new TreeNode(10);
+	TreeNode* root7 = new TreeNode(4, nullptr, root8);
+	TreeNode* root6 = new TreeNode(-3);
+	TreeNode* root5 = new TreeNode(-5, nullptr, root6);
+	TreeNode* root4 = new TreeNode(1, root5, root7);
+	TreeNode* root3 = new TreeNode(9);
+	TreeNode* root2 = new TreeNode(6, root3, nullptr);
+	TreeNode* root1 = new TreeNode(8, root2, root4);
+	TreeNode* root = new TreeNode(4, root1, nullptr);
+	cout << maxSumBST(root) << endl;
+}
+
+
 
 bool COMPARE(int x, int y)
 {
@@ -96,7 +192,7 @@ void MERGE_SORT(int* A, int p, int r)
 	}
 }
 
-int main()
+int MAIN()
 {
     long long nums;
     cin >> nums;

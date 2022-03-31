@@ -31,6 +31,8 @@ void newexcp_cpp();
 
 void use_sales_cpp();
 
+void constcast_cpp();
+
 class demo
 {
 private:
@@ -479,7 +481,55 @@ int main()
 	//				Low* pl = (Low*)(pbar);			// invalid
 	//			由于编程时可能无意间同时改变类型和常量特征,因此使用 const_cast 运算符更安全
 	//			const_cast 不是万能的,它可以修改指向一个值的指针,但修改 const 值的结果是不确定的
-	//
+	if (WhichOne == 10)	constcast_cpp();
+	//			调用 change() 时,修改了 pop1,但没有修改 pop2
+	//			在 change() 中,指针被声明为 const int* ,因此不饿能用来修改指向的 int
+	//			指针 pc 删除了 const 特征,因此可用来修改指向的值
+	//			但仅当指向的值不是 const 时才可行
+	//			因此, pc 可用于修改 pop1 ,但不能用于修改 pop2
+	//		3.static_cast 运算符
+	//			语法与其他类型转换运算符相同:
+	//				static_cast < type-name > (expression)
+	//			仅当 type-name 可被隐式转换为 expression 所属的类型
+	//			或 expression 可被隐式转换为 type-name 所属类型时
+	//			上述转换才是合法的,否则将出错
+	//			假设 High 是 Low 的基类,而 Pond 是一个无关的类
+	//			则从 High 到 Low 的转换,从 Low 到 High 的转换都是合法的
+	//			而从 Low 到 Pond 的转换是不允许的:
+	//				High bar;
+	//				Low blow;
+	//				...
+	//				High* pb = static_cast<High*>(&blow);		// valid upcast
+	//				Low* pl = static_cast<Low*>(&bar);			// valid downcast
+	//				Pond* pmer = static_cast<Pond*>(&blow);		// invalid, Pond unrelated
+	//			第一种转换时合法的,因为向上转换可以显示地进行
+	//			第二种转换是从基类指针到派生类指针,在不进行显示类型转换的情况下,将无法进行
+	//				但由于无需进行类型转换,便可以进行另一个方向的类型转换
+	//				因此使用 static_cast 来进行向下转换是合法的
+	//				同理,由于无需进行类型转换,枚举量就可以被转换为整型
+	//				所以可以用 static_cast 将整型转换为枚举量
+	//				同样,可以使用 static_cast 将 double 转换为 int
+	//				将 float 转换为 long 以及其他各种数值转换
+	//		4.reinterpret_cast 运算符
+	//			用于天生危险的类型转换
+	//			它不允许删除 const ,但会执行其他令人生厌的操作
+	//			又是程序员必须做一些依赖于实现的,令人生厌的操作
+	//			使用 reinterpret_cast 运算符可以简化对这种行为的跟踪工作
+	//			语法与其他类型转换运算符相同:
+	//				reinterpret_cast < type-name > (expression)
+	//			示例:
+	struct dat {short a; short b;};
+	 long value = 0xA224B118;
+	dat* pd = reinterpret_cast<dat*>(&value);
+	cout << sizeof(long) << " " << sizeof(short) << " " << sizeof(int) << endl;
+	cout << hex << pd->a << endl;		// display first 2 bytes of value
+	cout << hex << pd->b;				// display second 2 bytes of value
+	//			通常,这样的转换适用于依赖于实现的底层编程技术,是不可移植的
+	//			例如,不同系统在存储多字节整型时,可能以不同的顺序存储其中的字节
+	//			然而, reinterpret_cast 运算符不支持所有的类型转换
+	//			例如,可以将指针类型转换为足以存储指针表示的整型
+	//			但不能将指针转换为更小的整型或浮点型
+	//			另一个限制是,不能将函数指针转换为数据指针,反之亦然
 
 	return 0;
 }
@@ -781,4 +831,22 @@ void use_sales_cpp()
 		cout << "bad index: " << bad.bi_val() << endl;
 	}
 	cout << "done\n";
+}
+
+// constcast.cpp
+void change(const int* pt, int n)
+{
+	int* pc;
+
+	pc = const_cast<int*>(pt);
+	*pc += n;
+}
+void constcast_cpp()
+{
+	int pop1 = 28282;
+	const int pop2 = 2000;
+	cout << "pop1, pop2: " << pop1 << ", " << pop2 << endl;
+	change(&pop1, -103);
+	change(&pop2, -103);
+	cout << "pop1, pop2: " << pop1 << ", " << pop2 << endl;
 }
