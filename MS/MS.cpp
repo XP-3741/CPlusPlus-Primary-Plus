@@ -2,10 +2,67 @@
 #include<vector>
 #include<stack>
 #include<algorithm>
+#include<string>
 using std::cin;
 using std::cout;
 using std::endl;
 using std::vector;
+using std::string;
+
+int xTemp = 5;
+
+void First(int n = 0, float m = 1.0)
+{
+	cout << "First::n = " << n << ", m = " << m << endl;
+}
+
+void Second(int& x)
+{
+	cout << "Second::x = " << x << endl;
+	x *= 2;
+}
+
+void Third()
+{
+	cout << "Third::" << endl;
+}
+
+int main()
+{
+
+	string i;
+	cin >> i;
+	/*while (1) {
+		int line[3];
+		for (int i = 0; i < 3; i++)
+			cin >> line[i];
+		for (int i = 0; i < 3; i++) {
+			switch (line[i]) {
+			case 1:
+				First();
+				break;
+			case 2:
+				Second(xTemp);
+				break;
+			case 3:
+				Third();
+				break;
+			default:
+				cout << "No\n";
+				break;
+			}
+		}
+		cout << "xTemp: " << xTemp << endl;
+	}*/
+}
+
+
+
+
+
+
+
+
 
 std::stack<int>right;
 std::stack<int>left;
@@ -85,7 +142,7 @@ int addVector(TreeNode* root)
 	}
 }
 
-int main()
+void MAIN()
 {
 	TreeNode* root8 = new TreeNode(10);
 	TreeNode* root7 = new TreeNode(4, nullptr, root8);
@@ -192,7 +249,7 @@ void MERGE_SORT(int* A, int p, int r)
 	}
 }
 
-int MAIN()
+void MAIN__fuck()
 {
     long long nums;
     cin >> nums;
@@ -212,7 +269,7 @@ int MAIN()
     for (int i = 0; i < nums; i++) {
         cout << input[i] << ".mp4" << endl;
     }*/
-    return 0;
+    //return 0;
 }
 
 /*DFS*/

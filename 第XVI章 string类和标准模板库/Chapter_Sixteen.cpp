@@ -1,11 +1,13 @@
 #include<iostream>
 #include<string>
+#include<fstream>
+#include<cstdlib>
 
 void str1_cpp();
+void strfile_cpp();
 
 int main()
 {
-	int whichOne = 1;
 	// string 类的构造函数
 	//		构造函数									描述
 	//	string(const char* s)				将 string 对象初始化为 s 指向的 NBTS
@@ -32,7 +34,81 @@ int main()
 	//	size_type 是一个依赖于实现的整型,是在头文件 string 中定义的
 	//	string 类将 string::npos 定义为字符串的最大长度,通常为 unsigned int 的最大值
 	//	另外,表格中使用缩写 NBTS(null-terminated string)来表示以空字符结束的字符串--传统C字符串
-	if (whichOne == 1)str1_cpp();
+	if (false) str1_cpp();
+	
+	// string 类输入
+	//	C-风格字符串,有三种方式:
+	//		char info[100];
+	//		cin >> info;			// read a word
+	//		cin.getline(info, 100);	// read a line, discard \n
+	//		cin.get(info, 100);		// read a line, leave \n in queue
+	//	对于 string 对象,有两种方式:
+	//		string stuff;
+	//		cin >> stuff;			// read a word
+	//		getline(cin, stuff);	// read a line, discard \n
+	//	两个版本的 getline() 都有一个可选参数,用于指定使用那个字符来确定输入边界:
+	//		cin.getline(info, 100, ';');	// read up to ; ,discard
+	//		getline(stuff, ';');			// read up to ; ,discard
+	//	在功能上,他们之间主要区别在于,string 版本的将自动调整目标 string 对象大小
+	//	限制因素:
+	//		- string 对象的最大允许长度,由常量 string::npos 指定
+	//		- 使用的内存量
+	//	string 版本的 getline() 函数从输入中读取字符,并将其存储到目标 string 中
+	//	直到遇到下列三种情况之一:
+	//		- 到达文件尾,在这种情况下,输入流的 eofbit 将被设置
+	//		  这意味着方法 fail() 和 eof() 都将返回 true
+	//		- 遇到分界字符(默认为\n),在这种情况下,将把分界字符从输入流中删除,但不存储它
+	//		- 读取的字符数达到最大允许值,在这种情况下,将设置输入流的 failbit
+	//		  这意味着方法 fail() 将返回 true
+	//	输入流对象有一个统计系统,用于跟踪流的错误状态
+	//		在这个系统中,检测到文件尾后将设置 eofbit 寄存器
+	//		检测到输入错误时将设置 failbit 寄存器
+	//		出现无法识别的故障(如硬盘故障)时将设置 badbit 寄存器
+	//		一切顺利时将设置 goodbit 寄存器
+	//	string 版本的 operator<<() 函数行为与此类似
+	//	只是它不断读取
+	//	直到遇到空白字符并将其留在输入队列中
+	//	而不是不断读取,直到遇到分界字符并将其丢弃
+	//  空白字符指的是空格,换行符和制表符
+	//	更普遍的说,是任何将其作为参数来调用 isspace() 时,该函数返回 ture 的字符
+	// 
+	//	下例程序是一个从文件读取字符的简短示例
+	//	它假设文件中包含用冒号字符分隔的字符串,并使用指定分节符 getline() 方法
+	//	然后显示字符串并给他们编号
+	if (false) strfile_cpp();
+	// 注意,将 : 指定为分解字符后,换行符将被视为常规字符
+	// 
+	// 使用字符串
+	//	对于每个关系运算符,都以三种方式被重载
+	//	以便能够将 string 对象与另一个 string 对象、C-风格字符串比较
+	//	并能够将 C-风格字符串 与 string 对象进行比较:
+	//		operator<(const string&, const string&)
+	//		operator==(const string&, const char *)
+	//		operator!=(const char *, const string&)
+	//	确定字符串长度
+	//		size()和length()成员函数都返回字符串中的字符数
+	//		length()成员来自较早版本的 string 类
+	//		而 size() 则是为提供 STL 兼容性而添加的
+	// 
+	// 重载的 find() 方法
+	//		方法原型												描述
+	//	size_type find(const string& str,			从字符串的 pos 位置开始,查找子字符串 str
+	//	size_type pos = 0) const					如果找到返回该子字符串首次出现时其首字符的索引
+	//												否则,返回 string::npos
+	//	size_type find(const char* s,				从字符串的 pos 位置开始,查找子字符串 s
+	//	size_type pos = 0) const					如果找到返回该子字符串首次出现时其首字符的索引
+	//												否则,返回 string::npos
+	//	size_type find(const char* s,				从字符串的 pos 位置开始,查找 s 的前 n 个字符组成的子字符串
+	//	size_type pos = 0,size_type n)				如果找到返回该子字符串首次出现时其首字符的索引
+	//												否则,返回 string::npos
+	//	size_type find(char ch,						从字符串的 pos 位置开始,查找字符 ch
+	//	size_type pos = 0) const					如果找到,则返回该字符首次出现的位置
+	//												否则,返回 string::npos
+	// 
+	//	string 库还提供了相关的方法:
+	//		rfind()、find_first_of()、find_last_of()、find_first_not_of()和find_last_not_of()
+	//		它们的重载函数特征标都与 find()方法相同
+	//
 
 	return 0;
 }
@@ -64,4 +140,31 @@ void str1_cpp()
 	cout << seven << "...\n";
 	string eight(four, 7, 16);			// ctor #7
 	cout << eight << " in motion!" << endl;
+}
+
+void strfile_cpp()
+{
+	using namespace std;
+	ifstream fin;
+	//fin.open("tobuy.txt");
+	fin.open("E:\\Projects_Myself\\VS2022_Projects\\C++PrimaryPlus\\第XVI章 string类和标准模板库\\tobuy.txt");
+	// C-风格字符串中转义序列 \\ 表示一个斜杠
+	if (fin.is_open() == false)
+	{
+		cerr << "Can't open file. Bye.\n";
+		exit(EXIT_FAILURE);
+	}
+	string item;
+	int count = 0;
+
+	getline(fin, item, ':');
+	while (fin) {	// while input is good
+		++count;
+		cout << count << ": " << item << endl;
+		getline(fin, item, ':');
+	}
+	cout << "Done\n";
+	fin.close();
+	// std::cin.get();
+	// std::cin.get();
 }
