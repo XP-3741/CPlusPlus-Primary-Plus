@@ -3,57 +3,59 @@
 #include<stack>
 #include<algorithm>
 #include<string>
+#include<ctime>
 using std::cin;
 using std::cout;
 using std::endl;
 using std::vector;
 using std::string;
 
-int xTemp = 5;
-
-void First(int n = 0, float m = 1.0)
+void output_Mode()				// 输出模式
 {
-	cout << "First::n = " << n << ", m = " << m << endl;
-}
-
-void Second(int& x)
-{
-	cout << "Second::x = " << x << endl;
-	x *= 2;
-}
-
-void Third()
-{
-	cout << "Third::" << endl;
+	cout.width(5);				//设置宽度
+	cout.setf(std::ios::left);	//设置对齐方式为left
+	cout.fill(' ');				//设置填充，缺省为空格
 }
 
 int main()
 {
+	int x;
+	
 
-	string i;
-	cin >> i;
-	/*while (1) {
-		int line[3];
-		for (int i = 0; i < 3; i++)
-			cin >> line[i];
-		for (int i = 0; i < 3; i++) {
-			switch (line[i]) {
-			case 1:
-				First();
-				break;
-			case 2:
-				Second(xTemp);
-				break;
-			case 3:
-				Third();
-				break;
-			default:
-				cout << "No\n";
-				break;
-			}
+	while (cin >> x) {
+		try {
+			double parity = (double)x / 2;
+			if (parity!=(int)parity)
+				throw "-1";
+			cout << parity << endl;
 		}
-		cout << "xTemp: " << xTemp << endl;
-	}*/
+		catch(...) {
+			cout << "fail\n";
+		}
+		
+	}
+
+	srand(time(0));
+	vector<vector<int>> temp(3, vector<int>(3));
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			temp[i][j] = rand() % 50;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			output_Mode();
+			cout << temp[i][j];
+		}
+		cout << endl;
+	}
+	cout << endl;
+	vector<int> rtemp;
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			rtemp.push_back(temp[i][j]);
+	sort(rtemp.begin(), rtemp.end());
+			
+
+	return 0;
 }
 
 

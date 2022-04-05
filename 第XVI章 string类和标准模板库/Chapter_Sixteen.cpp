@@ -4,10 +4,13 @@
 #include<cstdlib>
 #include <ctime>
 #include <cctype>
+#include<memory>		// for auto_ptr, unique_ptr, shared_ptr
 
 void str1_cpp();
 void strfile_cpp();
 void hangman_cpp();
+void str2_cpp();
+void smrtptrs_cpp();
 
 int main()
 {
@@ -126,7 +129,51 @@ int main()
 	//			因此下面的语句返回 c 在"cobra"中的位置,因为"hark"中没有 c:
 	//			int where = snake1.find_last_of("hark");
 	if(false)	hangman_cpp();
-	//	
+	// string 提供的其他功能
+	//	string 库还提供了很多其他的工具,包括完成下述功能的函数:
+	//		(附录F简要地介绍了 string 库中的函数)
+	//	方法 capacity() 返回当前分配给字符串的内存块的大小
+	//	而 reserve() 方法能够请求内存块的最小长度
+	if(false)	str2_cpp();
+
+	// 如果有 string 对象,但需要 C-风格字符串,该如何办:
+	//		例如,可能想打开一个其名称存储在 string 对象中的文件
+	//			string filename;
+	//			cout << "Enter file name: ";
+	//			cin >> filename;
+	//			ofstream fout;
+	//		不幸的是,open()方法要求使用一个 C-风格字符串作为参数
+	//		幸运的是, c_str() 方法返回一个指向 C-风格字符串的指针
+	//		该 C-风格字符串的内容与用于调用 c_str() 方法的 string 对象相同:
+	//			fout.open(filename.c_str());
+	// 
+	// 字符串种类
+	//	本节将 string 类看作是基于 char 类型的
+	//	事实上,正如前面指出,string 库实际上是基于一个模板类的:
+	//		template<class charT, class traits = char_traits<charT>,
+	//				class Allocator = allocator<charT> >
+	//		basic_string {...}
+	//	模板 basic_string 有4个具体化,每个具体化都有一个 typedef 名称:
+	//		typedef basic_string<char> string;
+	//		typedef basic_string<wchar_t> wstring;
+	//		typedef basic_string<char16_t> u16string;		// C++11
+	//		typedef basic_string<char32_t> u32string;		// C++11
+	// 
+	// 智能指针模板类
+	//	智能指针是行为类似于指针的类对象,但这种对象还有其他功能
+	//	这三个智能指针模板(auto_ptr,unique_ptr和shared_ptr)都定义了类似指针的对象
+	//	可以将 new 获得(直接或间接)的地址赋给这种对象
+	//	当智能指针过期时,其析构函数将使用 delete 来释放内存
+	//	因此,如果将 new 返回的地址赋给这些对象,无需记住稍后释放这些内存
+	if(false)	smrtptrs_cpp();
+	//	所有智能指针都有一个 explicit 构造函数,该构造函数将指针作为参数
+	//	因此不需要自动将指针转换为智能指针对象:
+	//		shared_ptr<double> pd;
+	//		double* p_red = new double;
+	//		pd = p_reg;								// not allowed (implicit conversion)
+	//		pd = shared_ptr<double>(p_red);			// allowed (explicit conversion)
+	//		shared_ptr<double> pshared = p_reg;		// not allowed (implicit conversion)
+	//		shared_ptr<double> pshared(p_reg);		// allowed (explicit conversion)
 	//
 
 	return 0;
@@ -268,4 +315,55 @@ void hangman_cpp()
 		play = tolower(play);
 	}
 	cout << "\nBye\n";
+}
+
+void str2_cpp()
+{
+	using namespace std;
+	string empty;
+	string small = "bit";
+	string larger= "Elephants are a girl's best friend";
+	cout << "Sizes:\n";
+	cout << "\tempty: " << empty.size() << endl;
+	cout << "\tsmall: " << small.size() << endl;
+	cout << "\tlarger: " << larger.size() << endl;
+	cout << "Capacities:\n";
+	cout << "\tempty: " << empty.capacity() << endl;
+	cout << "\tsmall: " << small.capacity() << endl;
+	cout << "\tlarger: " << larger.capacity() << endl;
+	empty.reserve(50);
+	cout << "Capacity after empty.reserve(50): "
+		<< empty.capacity() << endl;
+	// cin.get();
+}
+
+void smrtptrs_cpp()
+{// smrtptrs.cpp -- using three kinds of smart pointers
+	class Report
+	{
+	private:
+		std::string str;
+	public:
+		Report(const std::string s):str(s) { std::cout << "Object created!\n"; }
+		~Report() { std::cout << "Object deleted!\n\n"; }
+		void comment() const { std::cout << str << "\n"; }
+	};
+
+	{
+		Report* ps = new Report("using nohting");
+		ps->comment();
+		std::cout << std::endl;
+	}
+	{
+		std::auto_ptr<Report>ps(new Report("using auto_ptr"));
+		ps->comment();
+	}
+	{
+		std::shared_ptr<Report>ps(new Report("using shared_ptr"));
+		ps->comment();
+	}
+	{
+		std::unique_ptr<Report>ps(new Report("using unique_ptr"));
+		ps->comment();
+	}
 }
