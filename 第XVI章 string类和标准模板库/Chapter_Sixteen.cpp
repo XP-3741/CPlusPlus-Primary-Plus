@@ -11,6 +11,7 @@ void strfile_cpp();
 void hangman_cpp();
 void str2_cpp();
 void smrtptrs_cpp();
+void fowl_cpp();
 
 int main()
 {
@@ -174,6 +175,67 @@ int main()
 	//		pd = shared_ptr<double>(p_red);			// allowed (explicit conversion)
 	//		shared_ptr<double> pshared = p_reg;		// not allowed (implicit conversion)
 	//		shared_ptr<double> pshared(p_reg);		// allowed (explicit conversion)
+	//	由于智能指针模板类的定义方式,智能指针对象的很多方面都类似于常规指针
+	//	例如,如果 ps 是一个指针指针对象,则可以对他执行解除引用操作(*ps)
+	//	用它来访问结构成员(ps->puffIndex),将他赋给指向相同类型的常规指针
+	//	还可以将指针指针对象赋给另一个同类型的智能指针对象,但将引起一个问题,将在加一节讨论
+	//	在此之前,先说说对全部三种智能指针都应避免的一点:
+	//		string vacation("T wandered lonely as a cloud.");
+	//		shared_ptr<string> pvac(&vacation);		// NO!
+	//	pvac 过期时,程序将把 delete 运算符用于非堆内存,这是错误的
+	// 
+	// 有关智能指针的注意事项
+	//	为何有三种智能指针?实际上有四种,但本书不讨论 weak_ptr,为何摒弃 auto_ptr?
+	//	先来看下面的赋值语句:
+	//		auto_ptr<string> ps (new string("Fuck YOU"));
+	//		auto_ptr<string> vacation;
+	//		vacation = ps;
+	//	如果 ps 和 vacation 是常规指针,则两个指针将指向同一个 string 对象
+	//	这是不能接受的,因为程序将试图删除同一个对象两次----一次是 ps 过期时,另一个是 vacation 过期
+	//	要避免这种问题,方法有多种
+	//		- 定义赋值运算符,使之执行深复制
+	//		  这样两个指针将指向不同的对象,其中的一个对象是另一个对象的副本
+	//		- 建立所有权(ownership)概念,对于特定的对象,只能有一个智能指针可拥有它
+	//		  这样只有拥有对象的智能指针的构造函数会删除该对象
+	//		  然后,让赋值操作转让所有权
+	//		  这就是用于 auto_ptr 和 unique_ptr 的策略,但 unique_ptr 的策略更严格
+	//		- 创建智能更高的指针,跟踪引用特定对象的智能指针数
+	//		  这称为引用计数(reference counting)
+	//		  例如,赋值时,计数将加1,而指针过期时,计数减1
+	//		  仅当最后一个指针过期时,才调用 delete,这是 shared_ptr 的策略
+	//	当然,同样的策略也适用于复制构造函数
+	//	下面程序是一个不合适使用 auto_ptr 的示例
+	if(false)	fowl_cpp();
+	//	当 i = 2 时,异常终止程序
+	//	问题在于M将所有权从 films[2] 转让给 pwin
+	//	这导致 films[2] 不在引用该字符串,在 auto_ptr 放弃对象所有权后,便可能使用它来访问对象
+	//	当程序打印 films[2] 指向的字符串时,却发现这是一个空指针
+	//	如果使用 shared_ptr 代替,则程序正常运行
+	//	如果使用 unique_ptr 会与 auto_ptr 一样,其也采用所有权模型
+	//	但使用 unique_ptr 时,不会等到程序运行阶段崩溃,而在编译器因下述代码出现错误:
+	//		pwin = films[2];
+	// 
+	// unique_ptr 为何优于 auto_ptr
+	//	下面的语句:
+	//		auto_ptr<string> p1(new string("auto"));	// #1
+	//		auto_ptr<string> p2;						// #2
+	//		p2 = p1;									// #3
+	//	在语句 #3 中,p2 接管对象的所有权后,p1 的所有权将被剥夺
+	//	前面说过,这是件好事,可防止 p1 和 p2 的析构函数试图删除同一个对象
+	//	但如果程序随后试图使用 p1,这是件坏事,因为 p1 不在指向有效数据
+	//	但如果是 unique_ptr 编译器会认为非法
+	//	但有时候,将一个智能指针赋给另一个并不会留下危险的悬挂指针,假设有如下函数定义:
+	//		unique_ptr<string> demo(const char* s)
+	//		{
+	//			unique_ptr<string> temp(new string(s));
+	//			retuen temp;
+	//		}
+	//	并假设编写了如下代码:
+	//		unique_ptr<stirng> ps;
+	//		ps = demo("Uniquely special");
+	//	demo() 返回一个临时 unique_ptr ,然后 ps 接管了原本归返回的 unique_ptr 所有的对象
+	//	而返回的 unique_ptr 被销毁,这没有问题,因为 ps 拥有了 string 对象的所有权
+	//	
 	//
 
 	return 0;
@@ -366,4 +428,35 @@ void smrtptrs_cpp()
 		std::unique_ptr<Report>ps(new Report("using unique_ptr"));
 		ps->comment();
 	}
+}
+
+void fowl_cpp()
+{// fowl.cpp  -- auto_ptr a poor choice
+	using namespace std;
+	auto_ptr<string> films[5] =
+	{
+		auto_ptr<string>(new string("Fowl Balls")),
+		auto_ptr<string>(new string("Duck Walks")),
+		auto_ptr<string>(new string("Chicken Runs")),
+		auto_ptr<string>(new string("Turkey Errors")),
+		auto_ptr<string>(new string("Goose Edds"))
+	};
+	auto_ptr<string> pwin;
+	/*shared_ptr<string> films[5] =
+	{
+		shared_ptr<string>(new string("Fowl Balls")),
+		shared_ptr<string>(new string("Duck Walks")),
+		shared_ptr<string>(new string("Chicken Runs")),
+		shared_ptr<string>(new string("Turkey Errors")),
+		shared_ptr<string>(new string("Goose Edds"))
+	};
+	shared_ptr<string> pwin;
+	*/
+	pwin = films[2];	// films[2] loses ownership
+
+	cout << "The nominees for best avian baseball film are\n";
+	for (int i = 0; i < 5; i++)
+		cout << *films[i] << endl;
+	cout << "The winner is " << *pwin << "!\n";
+	// cin.get();
 }
