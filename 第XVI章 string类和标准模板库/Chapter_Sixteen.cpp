@@ -5,6 +5,7 @@
 #include <ctime>
 #include <cctype>
 #include<memory>		// for auto_ptr, unique_ptr, shared_ptr
+#include<vector>
 
 void str1_cpp();
 void strfile_cpp();
@@ -12,6 +13,8 @@ void hangman_cpp();
 void str2_cpp();
 void smrtptrs_cpp();
 void fowl_cpp();
+std::unique_ptr<std::string> demo(const char* s);
+void vect1_cpp();
 
 int main()
 {
@@ -235,8 +238,55 @@ int main()
 	//		ps = demo("Uniquely special");
 	//	demo() 返回一个临时 unique_ptr ,然后 ps 接管了原本归返回的 unique_ptr 所有的对象
 	//	而返回的 unique_ptr 被销毁,这没有问题,因为 ps 拥有了 string 对象的所有权
-	//	
-	//
+	//	总之,程序试图将一个 unique_ptr 赋给另一个时,如果源 unique_ptr 是个临时右值
+	//	编译器允许这样做;如果源 unique_ptr 将存在一段时间,编译器将禁止这样做
+	//		unique_ptr<string> pu1(new stirng "Hi ho!");
+	//		unique_ptr<string> pu2;
+	//		pu2 = pu1;										// not allowed
+	//		unique_ptr<string> pu3;
+	//		pu3 = unique_ptr<string>(new string"Yo!");		// allowed
+	//	C++有一个标准库函数 std::move(),能够将一个 unique_ptr 赋给另一个
+	if (false) {
+		std::unique_ptr<std::string> ps1, ps2;
+		ps1 = demo("Uniquely special");
+		ps2 = std::move(ps1);
+		ps1 = demo(" and more");
+		std::cout << *ps2 << *ps1 << std::endl;
+	}
+	//	相比于 auto_ptr ,unique_ptr 还有一个优点
+	//		它有一个可用于数组的变体,必须将 delete 和 new 配对,将 delete[] 和 new[] 配对
+	//		模板 auto_ptr 使用 delete 而不是 delete[],因此只能与 new 一起使用
+	//		但 unique_ptr 有使用 new[] 和 delete[] 的版本:
+	//			std::unique_ptr<double[]>pda(new double(5));
+	//	当 unique_ptr 为右值时,可将其赋给 shared_ptr ,这与将一个 unique_ptr 赋给另一个满足需要的条件相同
+	//	模板 shared_ptr 包含一个显示构造函数,可用于将右值 unique_ptr 转换为 shared_ptr
+	//	shared_ptr 将接管原来归 unique_ptr 所有的对象
+
+	// 标准模板库
+	//	STL提供了一组表示容器、迭代器、函数对象和算法的模板
+	//	 - 容器是一个与数组类似的单元,可以存储若干个值,STL容器是同质的,即存储的值的类型相同
+	//	 - 算法是完成特定任务(如对数组进行排序或在链表中查找特定值)的处方
+	//	 - 迭代器能够用来遍历容器的对象,与能够遍历数组的指针类似.是广义指针
+	//	 - 函数对象是类似于函数的对象,可以是类对象或函数指针(包括函数名,因为函数名别用作指针)
+	//	STL使得能够构造各种容器(包括数组、队列和链表)和执行各种操作(包括搜索、排序和随机排序)
+	//	STL不是面向对象的编程,而是一种不同的编程模式----泛型编程(generic programming)
+	// 
+	//	模板类 vector
+	//		在计算中,矢量(vector)对应数组,而不是11章介绍的数学矢量
+	//		计算矢量存储了一组可随机访问的值,即可以使用索引来直接访问矢量的第 i 个元素
+	//		而不必先访问前面第 i-1 个元素
+	//		要创建 vector 模板对象,可使用通常的 <type> 表示法来指出要使用的类型
+	//		另外, vector 模板使用动态内存分配,因此可以用初始化参数来指出需要多少矢量
+	//		由于运算符[]被重载,因此可以使用通常的数组表示法来访问各个元素
+	// 
+	//		分配器:
+	//			与 string 类相似,各种STL容器模板都接受一个可选的模板参数
+	//			该参数指定使用哪个分配器对象来管理内存
+	//			例如,vector 模板的开头与下面类似:
+	//			template<class T, class Allocator = allocator<T>>
+	//				class vector { ...
+	//			如果省略该模板参数的值,则容器模板将默认使用 allocator<T>类,这个类使用 new 和 delete
+	vect1_cpp();
 
 	return 0;
 }
@@ -458,5 +508,42 @@ void fowl_cpp()
 	for (int i = 0; i < 5; i++)
 		cout << *films[i] << endl;
 	cout << "The winner is " << *pwin << "!\n";
+	// cin.get();
+}
+
+std::unique_ptr<std::string> demo(const char* s)
+{
+	std::unique_ptr<std::string> temp(new std::string(s));
+	return temp;
+}
+
+void vect1_cpp()
+{// vect1.cpp -- introducing the vector template
+	using std::vector;
+	using std::string;
+	using std::cin;
+	using std::cout;
+	using std::endl;
+	const int NUM = 5;
+
+	vector<int>ratings(NUM);
+	vector<string>titles(NUM);
+	cout << "You will do exactly as told. You will enter\n"
+		<< NUM << " book titles and your ratings (0-10).\n";
+	int i;
+	for (i = 0; i < NUM; i++)
+	{
+		cout << "Enter titles #" << i + 1 << ": ";
+		getline(cin, titles[i]);
+		cout << "Enter yours rating (0-10): ";
+		cin >> ratings[i];
+		cin.get();
+	}
+	cout << "Thank you. You entered the following:\n"
+		<< "Rating\tBook\n";
+	for (i = 0; i < NUM; i++)
+	{
+		cout << ratings[i] << "\t" << titles[i] << endl;
+	}
 	// cin.get();
 }
