@@ -15,6 +15,7 @@ void smrtptrs_cpp();
 void fowl_cpp();
 std::unique_ptr<std::string> demo(const char* s);
 void vect1_cpp();
+void vect2_cpp();
 
 int main()
 {
@@ -286,7 +287,81 @@ int main()
 	//			template<class T, class Allocator = allocator<T>>
 	//				class vector { ...
 	//			如果省略该模板参数的值,则容器模板将默认使用 allocator<T>类,这个类使用 new 和 delete
-	vect1_cpp();
+	if(false)	vect1_cpp();
+	//			可对矢量执行的操作:
+	//			所有的STL容器都提供了一些基本方法,其中包括
+	//				size()----返回容器中元素数目
+	//				swap()----交换两个容器内容
+	//				begin()----返回一个指向容器第一个元素的迭代器
+	//				end()----返回一个表示超过容器尾的迭代器
+	//			迭代器:
+	//				它是一个广义指针
+	//				事实上,它可以是指针,也可以是一个可对其执行类似指针操作
+	//				----如解除引用(opeartor*())和递增(如opeartor++())----的对象
+	//				稍后将知道,将广义指针化为迭代器,让STL能够为各种不同的容器类
+	//				(包括那些简单指针无法处理的类)提供统一的接口
+	//				每个容器类都定义了一个合适的迭代器,该迭代器的类型是一个名为
+	//				iterator 的 typedef,其作用域为整个类
+	//				例如,要为 vector 的 double 类型规范声明一个迭代器,可以这样做:
+	//					vector<double>::iterator pd;
+	//				假设 scores 是一个 vector<double> 对象
+	//				则可以使用迭代器 pd 执行这样的操作:
+	//					pd = scores.begin();
+	//					*pd = 22.3;
+	//					++pd;
+	//				正如你所看到的,迭代器的行为就像指针
+	//				顺便一提,还有一个 C++11 自动推断类型很有用的地方
+	//				例如,可以不这样做:
+	//					vector<double>::iterator pd = scores.begin();
+	//				而这样做:
+	//					auto pd = scores.begin();
+	//			回到前面的示例,什么是超过结尾(past-the-end)
+	//			它是一种迭代器,指向容器最后一个元素后面的那个元素
+	//		所有容器都包含刚才讨论的方法
+	//		vector 模板类也包含一些只有某些STL容器才有的方法
+	//			push_back()----将元素添加到矢量末尾
+	//							这样做时,它将负责内存管理,增加矢量的长度	
+	//			erase()----删除矢量中给定区间的元素
+	//							它接受两个迭代器参数,这些参数定义了要删除的区间
+	//							第一个迭代器指向区间的起始处,第二个迭代器位于区间终止处的后一个位置
+	//							下列代码删除第一个和第二个元素
+	//								scores.erase(scores.begin(),scores.begin()+2);
+	//			insert()----功能与erase()相反,它接受3个迭代器参数
+	//							第一个参数指定了新元素的插入位置
+	//							第二个二个和第三个迭代器参数定义了被插入区间
+	//							该区间通常是另一个容器对象的一部分
+	//							例如,下面的代码将矢量 new_v 中除了第一个元素外的所有元素插入到
+	//							old_v 矢量的第一个元素前面:
+	//								vector<int> old_v;
+	//								vector<int> new_v;
+	//								...
+	//								old_v.insert(old_v.begin(), new_v.begin()+1, new_v.end());
+	if(false)	vect2_cpp();
+	//	对矢量可执行的其他操作
+	//		3个具有代表性的STL函数:
+	//			for_each()----接受三个参数,前两个是定义容器中区间的迭代器,最后一个是指向函数的指针
+	//							(更普遍的说,最后一个参数是一个函数对象,函数对象将稍后介绍)
+	//							此函数将被指向的函数应用于容器区间中的各个元素
+	//							被指向的函数不能修改容器元素的值
+	//							可以用 for_each() 函数来代替 for 循环
+	//							例如,可以将代码:
+	//								vector<Review>::iterator pr;
+	//								for (pr = books.begin(); pr != books.end(); pr++)
+	//								ShowReview(*pr);
+	//							替换为:
+	//								for_each(books.begin(),books.end(),ShowReview);
+	//							这样可避免显示地使用迭代器变量
+	//			random_shuffle()----接受两个指定区间的迭代器参数,并随机排列区间中的元素
+	//							例如,下面的语句随机排序 books 矢量中所有元素:
+	//								random_shuffle(books.begin(),books.end());
+	//							与可用于任何容器类的 for_each 不同
+	// 							该函数要求容器类允许随机访问,vector 类可以做到这一点
+	//							sort()函数也要求容器支持随机访问
+	// 							该函数有两个版本,第一个版本接受两个定义区间的迭代器参数
+	// 							并使用为存储在容器中的类型元素定义的<运算符,对区间中的元素进行操作
+	// 							如果容器元素使用户定义的对象,则要使用sort()
+	// 							必须定义能够处理该类型对象的operator<()函数
+	//
 
 	return 0;
 }
@@ -546,4 +621,78 @@ void vect1_cpp()
 		cout << ratings[i] << "\t" << titles[i] << endl;
 	}
 	// cin.get();
+}
+
+struct Review {
+	std::string title;
+	int rating;
+};
+
+bool FillReview(Review&);
+void ShowReview(const Review&);
+
+void vect2_cpp()
+{
+	using std::cout;
+	using std::vector;
+	vector<Review>books;
+	Review temp;
+	while (FillReview(temp))
+		books.push_back(temp);
+	int num = books.size();
+	if (num > 0)
+	{
+		cout << "Thank you. You entered the following:\n"
+			<< "Rating\tBook\n";
+		for (int i = 0; i < num; i++)
+			ShowReview(books[i]);
+		cout << "Reprising:\n"
+			<< "Rating\tBook\n";
+		vector<Review>::iterator pr;
+		for (pr = books.begin(); pr != books.end(); pr++)
+			ShowReview(*pr);
+		vector<Review> oldlist(books);		// copy constructor used
+		if (num > 3)
+		{
+			// remove 2 items
+			books.erase(books.begin() + 1, books.begin() + 3);
+			cout << "After erasure:\n";
+			for (pr = books.begin(); pr != books.end(); pr++)
+				ShowReview(*pr);
+			// insert 1 item
+			books.insert(books.begin(), oldlist.begin() + 1,
+						oldlist.begin() + 2);
+			cout << "After insertion:\n";
+			for (pr = books.begin(); pr != books.end(); pr++)
+				ShowReview(*pr);
+		}
+		books.swap(oldlist);
+		cout << "Swapping oldlist with books:\n";
+		for (pr = books.begin(); pr != books.end(); pr++)
+			ShowReview(*pr);
+	}
+	else
+		cout << "Nothing entered, nothing gained.\n";
+	// std::cin.get();
+}
+
+bool FillReview(Review& rr)		/* 输入范例 */
+{
+	std::cout << "Enter book title (quit to quit): ";
+	std::getline(std::cin, rr.title);
+	if (rr.title == "quit")
+		return false;
+	std::cout << "Enter book rating: ";
+	std::cin >> rr.rating;
+	if (!std::cin)
+		return false;
+	// get rid of rest of input line
+	while (std::cin.get() != '\n')
+		continue;
+	return true;
+}
+
+void ShowReview(const Review& rr)
+{
+	std::cout << rr.rating << "\t" << rr.title << std::endl;
 }

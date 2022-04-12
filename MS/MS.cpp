@@ -19,41 +19,13 @@ void output_Mode()				// Êä³öÄ£Ê½
 
 int main()
 {
-	int x;
-	
+	int pField[7] = { 0,4,2,3,6,1,5 };
+	wchar_t* screan = new wchar_t[7];
 
-	while (cin >> x) {
-		try {
-			double parity = (double)x / 2;
-			if (parity!=(int)parity)
-				throw "-1";
-			cout << parity << endl;
-		}
-		catch(...) {
-			cout << "fail\n";
-		}
-		
+	for (int i = 0; i < 7; i++) {
+		screan[i] = L" ABCDE#"[pField[i]];
+		printf("%c ", screan[i]);
 	}
-
-	srand(time(0));
-	vector<vector<int>> temp(3, vector<int>(3));
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			temp[i][j] = rand() % 50;
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			output_Mode();
-			cout << temp[i][j];
-		}
-		cout << endl;
-	}
-	cout << endl;
-	vector<int> rtemp;
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			rtemp.push_back(temp[i][j]);
-	sort(rtemp.begin(), rtemp.end());
-			
 
 	return 0;
 }
