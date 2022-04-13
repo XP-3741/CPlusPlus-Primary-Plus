@@ -17,18 +17,103 @@ void output_Mode()				// 输出模式
 	cout.fill(' ');				//设置填充，缺省为空格
 }
 
+struct xy {
+	int x;
+	int y;
+};
+vector<xy> indexs;
+
+int MidSubarrays(vector<int>& nums, int r, int x, int y)
+{
+	int first_zf = nums[r] - nums[r - 1];
+	int left_index, right_index;
+	int judge_right = 0;
+	if (first_zf != 0) {
+		int judge = (first_zf > 0) ? 1 : -1;
+		judge_right = judge * -1;
+		left_index = r - 1;
+		while (left_index > x) {
+			if ((nums[left_index] - nums[left_index - 1]) * judge >= 0)  break;
+			left_index--;
+			judge *= -1;
+		}
+	}
+	else
+		left_index = r;
+	first_zf = nums[r + 1] - nums[r];
+	if (first_zf != 0) {
+		if (judge_right == 0)
+			judge_right = (first_zf > 0) ? 1 : -1;
+		right_index = r + 1;
+		while (right_index < y) {
+			if ((nums[right_index + 1] - nums[right_index]) * judge_right >= 0)  break;
+			right_index++;
+			judge_right *= -1;
+		}
+	}
+	else
+		right_index = r;
+	indexs.push_back({ left_index,right_index });
+	return (right_index == left_index) ? 1 : right_index - left_index + 1;
+}
+
+int LRSubarrays(vector<int>& nums, int x, int y)
+{
+	if (x == y)    return 1;
+	if (x + 1 == y)  return 2;
+	int index = x + 1;
+	int first_zf = nums[index] - nums[x];
+	if (first_zf != 0) {
+		int judge = (first_zf > 0) ? 1 : -1;
+		index++;
+		while (index <= y) {
+			if ((nums[index] - nums[index - 1]) * judge >= 0)    break;
+			index++;
+			judge *= -1;
+		}
+	}
+	if (index > y) {
+		indexs.push_back({ x,y });
+		return y - x + 1;
+	}
+		
+	int r = (x + y) / 2;
+	int left_max = LRSubarrays(nums, x, r - 1);
+	int right_max = LRSubarrays(nums, r + 1, y);
+	int mid_max = MidSubarrays(nums, r, x, y);
+	int largest_ = 0;
+	if (left_max > right_max)  largest_ = left_max;
+	else    largest_ = right_max;
+	if (mid_max > largest_)    largest_ = mid_max;
+	return largest_;
+}
+
+int wiggleMaxLength(vector<int>& nums) {
+	return LRSubarrays(nums, 0, nums.size() - 1);
+}
+
 int main()
 {
-	int pField[7] = { 0,4,2,3,6,1,5 };
-	wchar_t* screan = new wchar_t[7];
-
-	for (int i = 0; i < 7; i++) {
-		screan[i] = L" ABCDE#"[pField[i]];
-		printf("%c ", screan[i]);
-	}
-
+	vector<int>nums = { 1,17,5,10,13,15,10,5,16,8 };
+					  // 16,-12,5,3,2,-5,-5,11,-8
+	cout << wiggleMaxLength(nums) << endl;
+	for (int i = 0; i < indexs.size(); i++)
+		cout << indexs[i].x << " " << indexs[i].y << endl;
 	return 0;
 }
+
+//int main()
+//{
+//	int pField[7] = { 0,4,2,3,6,1,5 };
+//	wchar_t* screan = new wchar_t[7];
+//
+//	for (int i = 0; i < 7; i++) {
+//		screan[i] = L" ABCDE#"[pField[i]];
+//		printf("%c ", screan[i]);
+//	}
+//
+//	return 0;
+//}
 
 
 

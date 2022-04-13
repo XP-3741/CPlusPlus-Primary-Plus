@@ -6,6 +6,7 @@
 #include <cctype>
 #include<memory>		// for auto_ptr, unique_ptr, shared_ptr
 #include<vector>
+#include<algorithm>
 
 void str1_cpp();
 void strfile_cpp();
@@ -16,6 +17,7 @@ void fowl_cpp();
 std::unique_ptr<std::string> demo(const char* s);
 void vect1_cpp();
 void vect2_cpp();
+void vect3_cpp();
 
 int main()
 {
@@ -361,7 +363,69 @@ int main()
 	// 							并使用为存储在容器中的类型元素定义的<运算符,对区间中的元素进行操作
 	// 							如果容器元素使用户定义的对象,则要使用sort()
 	// 							必须定义能够处理该类型对象的operator<()函数
-	//
+	//							如 Review 可这样定义:
+	//								bool opeartor<(const Review & r1, const Review & r2)
+	//								{
+	//									if (r1.title < r2.title)
+	//										return true;
+	// 									else if(r1.title == r2.title && r1.rating < r2.rating)
+	// 										return true;
+	// 									else
+	// 										return false;
+	//								}
+	//							如果想按照 rating 降序,可使用另一种格式的 sort()
+	//							它接受三个参数,前两个参数也是指定区间的迭代器
+	//							最后一个参数是指向要使用的函数指针(函数对象)
+	//								bool WorseThan(const Review & r1, const Review & r2)
+	//								{
+	//									if(r1.rating < r2.rating)
+	//										return true;
+	//									else
+	//										return false;
+	//								}
+	//								sort(books.begin(),books.end(),WorseThan);
+	if(false)	vect3_cpp();
+	//	基于范围的for循环(C++11)
+	//		第5章说过,基于范围的for循环是为用于STL而设计的
+	//			double prices[5] = {4.99, 10.99, 6.83, 9.23, 1.33};
+	//			for(double x : prices)
+	//				cout << x << endl;
+	//		在这种for循环中,括号内的代码声明一个类型与容器存储的内容相容的变量
+	//		然后指出了容器的名称,接下来,循环体使用指定的变量一次访问容器的每个元素
+	//		例如下述语句:
+	//			for_each(books.begin(),books.end(),ShowReview);
+	//		可替换为:
+	//			for(auto x : books)	ShowReview(x);
+	//		不同于 for_each(),基于范围的 for 循环可修改容器内容,诀窍是指定一个引用参数
+	//		例如:
+	//			void InflateReview(Review &r) {r.rating++;}
+	//			for(auto& x : books) InflateReview(x);
+	
+	//	泛型编程
+	/*
+		STL是一种泛型编程(generic programming)
+		面向对象编程关注的是编程的数据方面,而泛型编程关注的是算法
+		他们之间的共同点是抽象和创建可重用代码,但它们的理念绝然不同
+		泛型编程旨在编写独立于数据类型的代码
+		在C++中,完成通用程序的工具是模板
+		当然,模板使得能够按泛型定义函数或类,而STL通过通用算法更进了一步
+		模板让这一切成为可能,但必须对元素进行仔细设计
+
+		为何使用迭代器:
+			模板使得算法独立于存储的数据类型,而迭代器使算法独立于使用的容器类型
+			模板提供了存储在容器中的数据类型的通用表示
+			因此还需要遍历容器中的值的通用表示,迭代器正是这样的通用表示
+			要实现 find 函数,迭代器应具备哪些特征,下面是一个简短的列表
+				- 应能够对迭代器执行解除引用的操作,以便能够访问它引用的值
+				  即如果 p 是一个迭代器,则应对 *p 进行定义
+				- 应能够将一个迭代器赋给另一个
+				  即如果 p 和 q 都是迭代器,则应对表达式 p=q 进行定义
+				- 应能够将一个迭代器与另一个进行比较,看他们是否相等
+				  即如果 p 和 q 都是迭代器,则应对 p==q 和 p!=q 进行定义
+				- 应能够使用迭代器遍历容器中的所有元素
+				  这可以通过为迭代器 p 定义 ++p 和 p++ 来实现
+
+	*/
 
 	return 0;
 }
@@ -695,4 +759,57 @@ bool FillReview(Review& rr)		/* 输入范例 */
 void ShowReview(const Review& rr)
 {
 	std::cout << rr.rating << "\t" << rr.title << std::endl;
+}
+
+bool operator<(const Review& r1, const Review& r2);
+bool worseThan(const Review& r1, const Review& r2);
+
+void vect3_cpp()
+{// vect3.cpp -- using STL functions
+	using namespace std;
+	vector<Review> books;
+	Review temp;
+	while (FillReview(temp))
+		books.push_back(temp);
+	if (books.size() > 0)
+	{
+		cout << "Thank you. You entered the following "
+			<< books.size() << " ratings:\n"
+			<< "Rating\tBook\n";
+		for_each(books.begin(), books.end(), ShowReview);
+
+		sort(books.begin(), books.end());
+		cout << "Sorted by title:\nRating\tBook\n";
+		for_each(books.begin(), books.end(), ShowReview);
+
+		sort(books.begin(), books.end(), worseThan);
+		cout << "Sorted by rating:\nRating\tBook\n";
+		for_each(books.begin(), books.end(), ShowReview);
+
+		random_shuffle(books.begin(), books.end());
+		cout << "After shuffling:\nRating\tBook\n";
+		for_each(books.begin(), books.end(), ShowReview);
+	}
+	else
+		cout << "No entries. ";
+	cout << "Bye.\n";
+	// cin.get();
+}
+
+bool operator<(const Review& r1, const Review& r2)
+{
+	if (r1.title < r2.title)
+		return true;
+	else if (r1.title == r2.title && r1.rating < r2.rating)
+		return true;
+	else
+		return false;
+}
+
+bool worseThan(const Review& r1, const Review& r2)
+{
+	if (r1.rating < r2.rating)
+		return true;
+	else
+		return false;
 }
