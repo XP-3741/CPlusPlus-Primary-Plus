@@ -7,6 +7,7 @@
 #include<memory>		// for auto_ptr, unique_ptr, shared_ptr
 #include<vector>
 #include<algorithm>
+#include<iterator>
 
 void str1_cpp();
 void strfile_cpp();
@@ -452,7 +453,7 @@ int main()
 			InputIterator find(InputIterator first, InputIterator last, const T& value);
 		这指出,这种算法需要一个输入迭代器,同样,下面的原型指出排序算法需要一个随机访问迭代器:
 			template<class RandomAccessIterator>
-			void find(RandomAccessIterator first, RandomAccessIterator last);
+			void sort(RandomAccessIterator first, RandomAccessIterator last);
 		对于这5种迭代器,都可以执行解除引用操作,也可进行比较,看其相等还是不等
 		如果两个迭代器相同,则对它们执行解除引用操作得到的值将相同
 			iter1 == iter2
@@ -485,7 +486,129 @@ int main()
 			与输入输出迭代器相似,正向迭代器只是用++运算符来遍历容器
 			所以它每次沿容器向前移动一个元素
 			然而,与输入输出迭代器不同的是,它总是按相同的顺序遍历一系列值
+
+		4.双向迭代器
+			reverse 函数可以交换第一元素和最后一元素、将指向第一个元素指针加1
+			将指向第二个元素的指针减1,并重复这种处理过程
+			双向迭代器具有正向迭代器的所有特性,同时支持两种(前缀和后缀)递减运算符
+
+		5.随机访问迭代器
+			有些算法(如标准排序和二分查找)要求能够直接跳到容器种的任何一个元素
+			这叫做 随机访问,需要随机访问迭代器
+			随机访问迭代器具有双向迭代器的所有特性
+			同时添加了支持随机访问的操作(如指针增加运算)和用于对元素进行排序的关系运算符
+			下标列出除双向迭代器操作外,随机访问迭代器还支持的操作
+			X 表示随机迭代器类型,T 表示被指向的类型,a 和 b 都是迭代器值, n 为整数
+			r 为随机迭代器变量或引用
+
+			表达式						描述
+			a + n						指向 a 所指的元素后的第 n 个元素
+			n + a						与 a + n 相同
+			a - n						指向 a 所指向的元素前的第 n 个元素
+			r += n						等价于 r = r + n
+			r -= n						等价于 r = r - n
+			a[n]						等价于 *(a + n)
+			b - a						结果为这样的 n 值,即 b = a + n
+			a < b						如果 b - a > 0,则为真
+			a > b						如果 b < a,则为真
+			a >= b						如果 !(a < b),则为真
+			a <= b						如果 !(a > b),则为真
 	*/
+
+	// 迭代器层次结构
+	/*
+		下标总结了主要的迭代器功能
+		其中, i 为迭代器, n 为整数
+
+													迭代器性能
+			迭代器功能			输入		输出			正向		双向		随机访问
+		   解除引用读取			 有			 无				 有			 有			   有
+		   解除引用写入			 无			 有				 有			 有			   有
+		 固定和可重复排序		 无			 无				 有			 有			   有
+			 ++i  i++			 有			 有				 有			 有			   有
+		       i  i				 无			 无				 无			 有			   有
+			   i[n]				 无			 无				 无			 无			   有
+			  i + n				 无			 无				 无			 无			   有
+			  i - n				 无			 无				 无			 无			   有
+			  i += n		     无			 无				 无			 无			   有
+			  i -= n			 无			 无				 无			 无			   有
+
+		需要这么多迭代器的目的:
+			为了在编写算法尽可能使用最低的迭代器,并让它适用于容器的最大区间
+			这样,通过使用级别最低的输入迭代器,find()函数比那可用于任何包含可读取值的容器
+			而sort()函数由于需要随机访问迭代器,所以只能用于支持这种迭代器的容器
+	*/
+
+	// 概念、改进和模型
+	/*
+		1.将指针用作迭代器
+			迭代器是广义指针,而指针满足所有的迭代器要求
+			迭代器是STL算法的接口,而指针是迭代器,因此STL算法可以使用指针来对基于指针的
+			非STL容器进行操作
+
+
+			int casts[10] = {6, 2, 4, 5, 8, 3, 1, 8, 2, 1};
+			vector<int> dice(10);
+			copy(casts, casts + 10, dice.begin());
+
+			copy()的前两个迭代器参数表示要复制的范围,最后一个迭代器参数表示要将第一个元素复制到什么位置
+			前两个位置必须是(或最好是)输入迭代器,最后一个必须是(或最好是)输出迭代器
+
+			现要将信息复制到显示器上
+			STL为这种迭代器提供了 ostream_iterator 模板
+			用STL的话说,该模板是输出迭代器概念的一个模型
+			它也是一个适配器(adapter) ---- 一个类或函数,可以将一些其他接口转换为STL使用的接口
+			可以通过包含头文件 iterator 并作下面的声明来创建这种迭代器:
+				#inlcude<iteartor>
+				...
+				ostream_iterator<int, char> out_iter(cout, " ");
+			out_iter 迭代器现在是一个接口,能够使用 cout 来显示信息
+			第一个模板参数(这里是 int)指出了被发送给输出流的数据类型
+			第二个模板参数(这里为 char)指出了输出流使用的字符类型(另一个可能的值是 wchar_t)
+			构造函数的第一个参数(这里为 cout)指出了要使用的输出流,它也可以是用于文件输出的流
+			最后一个字符串参数是在发送给输出流的每个数据项后显示的分隔符
+				可以这样使用迭代器:
+				*out_iter++ = 15;		// works like cout << 15 << " ";
+			对于常规指针,这意味着将 15 赋给指针指向的位置,然后将指针加 1
+			但对于该 ostream_iterator,这意味着将 15 和由空格组成的字符串
+			发送到 cout 管理的输出流中,并未下一个输出操作做好了准备
+			可以将 copy() 用于迭代器:
+				copy(dice.begin(), dice.end(), out_iter);
+			这意味着将 dice 容器的整个区间复制到输出流中,即显示容易的内容
+			也可以不创建命名的迭代器,而直接构建一个匿名迭代器:
+				copy(dice.begin(), dice.end(), ostream_iterator<int, char>(cout," "));
+			iterator 头文件还定义了一个 istream_iterator 模板
+			使用 istream 输入可用作迭代器接口
+			它是一个输入迭代器概念的模型
+			可以使用两个 istream_iterator 对象来定义 copy() 的输入范围:
+				copy(istream_iteartor<int, char>(cin),
+					istream_iteartor<int, char>(), dice.begin());
+			istream_iterator 的第一个参数指出要读取的数据类型
+			第二个参数指出输入流使用的字符类型
+			使用构造函数参数 cin 意味着使用由 cin 管理的输入流
+			省略构造函数参数表述输入失败
+			因此上述代码从输入流中读取,直到文件结尾、类型不匹配或出现其他输入故障为止
+
+		2.其他有用的迭代器
+			头文件 iterator 提供了一些专用的预定义迭代器类型:
+				reverse_iterator、back_iterator、front_insert_iterator 和 insert_iterator
+
+	*/
+	std::ostream_iterator<int, char> out_iter(std::cout, " ");
+	*out_iter = 15;
+	*out_iter++ = 16;
+
+	int casts[10] = { 6, 2, 4, 5, 8, 3, 1, 8, 2, 1 };
+	std::vector<int> dice(10); 
+
+	std::copy(casts, casts + 10, dice.begin());
+
+	std::copy(dice.begin(), dice.end(), std::ostream_iterator<int, char>(std::cout," "));
+
+	std::copy(std::istream_iterator<int, char>(std::cin),
+		std::istream_iterator<int, char>(), dice.begin());
+
+	std::copy(dice.begin(), dice.end(), std::ostream_iterator<int, char>(std::cout, " "));
 
 	return 0;
 }

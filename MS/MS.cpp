@@ -4,6 +4,8 @@
 #include<algorithm>
 #include<string>
 #include<ctime>
+#include <opencv2/opencv.hpp>
+using namespace cv;
 using std::cin;
 using std::cout;
 using std::endl;
@@ -16,6 +18,192 @@ void output_Mode()				// 输出模式
 	cout.setf(std::ios::left);	//设置对齐方式为left
 	cout.fill(' ');				//设置填充，缺省为空格
 }
+
+int main()
+{
+	Mat picture = imread("E:/MS/壁纸/C++.jpg", IMREAD_REDUCED_COLOR_8);  //图片的路径
+	resize(picture, picture, Size(picture.cols / 2, picture.rows / 2));
+	imshow("测试OpenCV", picture);
+	waitKey(0);
+	return 0;
+}
+
+
+
+typedef int ElemType;
+struct TreeChainNode
+{
+	ElemType Data;
+	TreeChainNode* LChild;
+	TreeChainNode* RChild;
+
+	TreeChainNode(ElemType D, TreeChainNode* L, TreeChainNode* R) {
+		Data = D;
+		LChild = L;
+		RChild = R;
+	}
+};
+
+int leafCounts(TreeChainNode* T)
+{
+	if (T->LChild == nullptr && T->RChild == nullptr)	return 1;
+	int leafSum = 0;
+	if (T->LChild)	leafSum += leafCounts(T->LChild);
+	if (T->RChild)	leafSum += leafCounts(T->RChild);
+	return leafSum;
+}
+
+void changeLR(TreeChainNode* T)
+{
+	if (T->LChild == nullptr && T->RChild == nullptr)	return;
+	TreeChainNode* temp = T->LChild;
+	T->LChild = T->RChild;
+	T->RChild = temp;
+	if (T->LChild)	changeLR(T->LChild);
+	if (T->RChild)	changeLR(T->RChild);
+}
+
+void All(TreeChainNode* T)
+{
+	cout << T->Data << endl;
+	if (T->LChild)	All(T->LChild);
+	if (T->RChild)	All(T->RChild);
+}
+
+
+struct chainNode
+{
+	char element;
+	chainNode* leftChild;
+	chainNode* rightChild;
+};
+
+struct HuffmanTree
+{
+	int weight;                 //结点的权值
+	int Lchild, Rchild, Parent; //存放左右结点,父结点下标
+	char letter;                //存放所表示的字符
+};
+
+void toChain(HuffmanTree* Tree, int index, vector<chainNode*>& hufTreeNode)
+{
+	if (Tree[index].Lchild == 0 || Tree[index].Rchild == 0) {
+		hufTreeNode[index]->leftChild = NULL;
+		hufTreeNode[index]->rightChild = NULL;
+		return;
+	}
+	hufTreeNode[index]->leftChild = hufTreeNode[Tree[index].Lchild];
+	hufTreeNode[index]->rightChild = hufTreeNode[Tree[index].Rchild];
+
+	toChain(Tree, Tree[index].Lchild, hufTreeNode);
+	toChain(Tree, Tree[index].Rchild, hufTreeNode);
+}
+
+void preOrder(chainNode* T)
+{
+	if (T)
+	{
+		cout << T->element << " ";
+		preOrder(T->leftChild);
+		preOrder(T->rightChild);
+	}
+}
+
+int H(int x)
+{
+	return (3 * x) % 11;
+}
+
+int main_1()
+{
+	vector<vector<int>>test;
+	test.push_back({ 0,99 });
+	test.push_back({ 1,25 });
+	test.push_back({ 2,74 });
+
+	vector<int> ts = test[0];
+	test[0] = test[1];
+	test[1] = ts;
+	for (int i = 0; i < test.size(); i++)
+		cout << test[i][0] << "   " << test[i][1] << endl;
+	return 0;
+
+	unsigned int temp = 1600000;
+
+	cout << 0.000001 * temp << endl << 1 / (0.000001 * temp);
+
+	unsigned int t1 = 1 / (0.000001 * temp);
+	cout << endl << t1;
+
+	return 0;
+	vector<int> s(3);
+	s[0] = 1; s[1] = 2; s[2] = 3;
+	vector<int> t(3);
+	t.insert(t.begin() + 0, s[0]);
+	for (int k : t)
+		cout << k << " ";
+	return 0;
+
+	cout << "32: " << H(32) << endl;
+	cout << "13: " << H(13) << endl;
+	cout << "49: " << H(49) << endl;
+	cout << "24: " << H(24) << endl;
+	cout << "38: " << H(38) << endl;
+	cout << "21: " << H(21) << endl;
+	cout << "4: " << H(4) << endl;
+	cout << "12: " << H(12) << endl;
+	return 0;
+
+	int i = 10;
+	int j = 12;
+	i = i ^ j;
+	j = j ^ i;
+	i = i ^ j;
+	cout << i << " " << j;
+	return 0;
+
+	const int n = 10;
+	int dp[n][n];
+	cout << sizeof(dp);
+	return 0;
+
+	HuffmanTree Tree[16];
+	Tree[1].Parent = 9;		Tree[1].Lchild = 0;		Tree[1].Rchild = 0;
+	Tree[2].Parent = 14;	Tree[2].Lchild = 0;		Tree[2].Rchild = 0;
+	Tree[3].Parent = 10;	Tree[3].Lchild = 0;		Tree[3].Rchild = 0;
+	Tree[4].Parent = 10;	Tree[4].Lchild = 0;		Tree[4].Rchild = 0;
+	Tree[5].Parent = 12;	Tree[5].Lchild = 0;		Tree[5].Rchild = 0;
+	Tree[6].Parent = 13;	Tree[6].Lchild = 0;		Tree[6].Rchild = 0;
+	Tree[7].Parent = 9;		Tree[7].Lchild = 0;		Tree[7].Rchild = 0;
+	Tree[8].Parent = 11;	Tree[8].Lchild = 0;		Tree[8].Rchild = 0;
+	Tree[9].Parent = 11;	Tree[9].Lchild = 7;		Tree[9].Rchild = 1;
+	Tree[10].Parent = 12;	Tree[10].Lchild = 3;	Tree[10].Rchild = 4;
+	Tree[11].Parent = 13;	Tree[11].Lchild = 9;	Tree[11].Rchild = 8;
+	Tree[12].Parent = 14;	Tree[12].Lchild = 5;	Tree[12].Rchild = 10;
+	Tree[13].Parent = 15;	Tree[13].Lchild = 11;	Tree[13].Rchild = 6;
+	Tree[14].Parent = 15;	Tree[14].Lchild = 2;	Tree[14].Rchild = 12;
+	Tree[15].Parent = 0;	Tree[15].Lchild = 13;	Tree[15].Rchild = 14;
+	for (int i = 1; i < 16; i++)
+		Tree[i].letter = '0' + i - 1;
+
+	int index_root = 1;
+	while (Tree[index_root].Parent != 0)	index_root++;
+
+	vector<chainNode*> hufTreeNode(16);
+	for (int i = 1; i <= 15; i++) {
+		hufTreeNode[i] = new chainNode;
+		hufTreeNode[i]->element = Tree[i].letter;
+	}
+	toChain(Tree, index_root, hufTreeNode);
+
+	chainNode* rootHuf = hufTreeNode[index_root];
+
+	preOrder(rootHuf);
+
+	return 0;
+}
+
+
 
 struct xy {
 	int x;
@@ -76,7 +264,7 @@ int LRSubarrays(vector<int>& nums, int x, int y)
 		indexs.push_back({ x,y });
 		return y - x + 1;
 	}
-		
+
 	int r = (x + y) / 2;
 	int left_max = LRSubarrays(nums, x, r - 1);
 	int right_max = LRSubarrays(nums, r + 1, y);
@@ -92,14 +280,45 @@ int wiggleMaxLength(vector<int>& nums) {
 	return LRSubarrays(nums, 0, nums.size() - 1);
 }
 
-int main()
+static bool cmp(const vector<int>& index1, const vector<int>& index2)
 {
-	vector<int>nums = { 1,17,5,10,13,15,10,5,16,8 };
-					  // 16,-12,5,3,2,-5,-5,11,-8
-	cout << wiggleMaxLength(nums) << endl;
-	for (int i = 0; i < indexs.size(); i++)
-		cout << indexs[i].x << " " << indexs[i].y << endl;
-	return 0;
+	if (index1.front() > index2.front())
+		return true;
+	return false;
+}
+
+int maxSumDivThree(vector<int>& nums) {
+	vector<vector<int>>sum_index(nums.size(), vector<int>(2));
+	sum_index[0][0] = nums[0];
+	sum_index[0][1] = (nums[0] % 3 == 0) ? 1 : 0;
+	for (int i = 1; i < nums.size(); i++) {
+		if ((nums[i] + sum_index[i - 1][0]) % 3 == 0) {
+			sum_index[i][0] = nums[i] + sum_index[i - 1][0];
+			sum_index[i][1] = sum_index[i - 1][1] + 1;
+		}
+		else {
+			int j = i - 2;
+			while (j >= 0) {
+				if ((nums[i] + sum_index[j][0]) % 3 == 0) {
+					sum_index[i][0] = nums[i] + sum_index[j][0];
+					sum_index[i][1] = sum_index[j][1] + 1;
+					break;
+				}
+				j--;
+			}
+			if (j < 0) {
+				sum_index[i][0] = nums[i];
+				sum_index[i][1] = 1;
+			}
+		}
+	}
+	sort(sum_index.begin(), sum_index.end(), cmp);
+
+	for (int i = 0; i < sum_index.size(); i++) {
+		cout << sum_index[i][0] << " " << sum_index[i][1] << endl;
+	}
+
+	return sum_index[0][0];
 }
 
 //int main()
