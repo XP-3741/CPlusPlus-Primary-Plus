@@ -8,6 +8,7 @@
 #include<vector>
 #include<algorithm>
 #include<iterator>
+#include<list>
 
 void str1_cpp();
 void strfile_cpp();
@@ -19,6 +20,9 @@ std::unique_ptr<std::string> demo(const char* s);
 void vect1_cpp();
 void vect2_cpp();
 void vect3_cpp();
+void copyit_cpp();
+void inserts_cpp();
+void list_cpp();
 
 int main()
 {
@@ -185,7 +189,7 @@ int main()
 	//	由于智能指针模板类的定义方式,智能指针对象的很多方面都类似于常规指针
 	//	例如,如果 ps 是一个指针指针对象,则可以对他执行解除引用操作(*ps)
 	//	用它来访问结构成员(ps->puffIndex),将他赋给指向相同类型的常规指针
-	//	还可以将指针指针对象赋给另一个同类型的智能指针对象,但将引起一个问题,将在加一节讨论
+	//	还可以将指针指针对象赋给另一个同类型的智能指针对象,但将引起一个问题,将在下一节讨论
 	//	在此之前,先说说对全部三种智能指针都应避免的一点:
 	//		string vacation("T wandered lonely as a cloud.");
 	//		shared_ptr<string> pvac(&vacation);		// NO!
@@ -207,14 +211,14 @@ int main()
 	//		  然后,让赋值操作转让所有权
 	//		  这就是用于 auto_ptr 和 unique_ptr 的策略,但 unique_ptr 的策略更严格
 	//		- 创建智能更高的指针,跟踪引用特定对象的智能指针数
-	//		  这称为引用计数(reference counting)
+	//		  这称为 引用计数(reference counting)
 	//		  例如,赋值时,计数将加1,而指针过期时,计数减1
 	//		  仅当最后一个指针过期时,才调用 delete,这是 shared_ptr 的策略
 	//	当然,同样的策略也适用于复制构造函数
 	//	下面程序是一个不合适使用 auto_ptr 的示例
 	if(false)	fowl_cpp();
 	//	当 i = 2 时,异常终止程序
-	//	问题在于M将所有权从 films[2] 转让给 pwin
+	//	问题在于将所有权从 films[2] 转让给 pwin
 	//	这导致 films[2] 不在引用该字符串,在 auto_ptr 放弃对象所有权后,便可能使用它来访问对象
 	//	当程序打印 films[2] 指向的字符串时,却发现这是一个空指针
 	//	如果使用 shared_ptr 代替,则程序正常运行
@@ -331,7 +335,7 @@ int main()
 	//								scores.erase(scores.begin(),scores.begin()+2);
 	//			insert()----功能与erase()相反,它接受3个迭代器参数
 	//							第一个参数指定了新元素的插入位置
-	//							第二个二个和第三个迭代器参数定义了被插入区间
+	//							第二个和第三个迭代器参数定义了被插入区间
 	//							该区间通常是另一个容器对象的一部分
 	//							例如,下面的代码将矢量 new_v 中除了第一个元素外的所有元素插入到
 	//							old_v 矢量的第一个元素前面:
@@ -359,11 +363,11 @@ int main()
 	//								random_shuffle(books.begin(),books.end());
 	//							与可用于任何容器类的 for_each 不同
 	// 							该函数要求容器类允许随机访问,vector 类可以做到这一点
-	//							sort()函数也要求容器支持随机访问
+	//							sort() 函数也要求容器支持随机访问
 	// 							该函数有两个版本,第一个版本接受两个定义区间的迭代器参数
-	// 							并使用为存储在容器中的类型元素定义的<运算符,对区间中的元素进行操作
-	// 							如果容器元素使用户定义的对象,则要使用sort()
-	// 							必须定义能够处理该类型对象的operator<()函数
+	// 							并使用为存储在容器中的类型元素定义的 < 运算符,对区间中的元素进行操作
+	// 							如果容器元素使用户定义的对象,则要使用 sort()
+	// 							必须定义能够处理该类型对象的 operator<() 函数
 	//							如 Review 可这样定义:
 	//								bool opeartor<(const Review & r1, const Review & r2)
 	//								{
@@ -387,11 +391,11 @@ int main()
 	//								sort(books.begin(),books.end(),WorseThan);
 	if(false)	vect3_cpp();
 	//	基于范围的for循环(C++11)
-	//		第5章说过,基于范围的for循环是为用于STL而设计的
+	//		第 5 章说过,基于范围的 for 循环是为用于 STL 而设计的
 	//			double prices[5] = {4.99, 10.99, 6.83, 9.23, 1.33};
 	//			for(double x : prices)
 	//				cout << x << endl;
-	//		在这种for循环中,括号内的代码声明一个类型与容器存储的内容相容的变量
+	//		在这种 for 循环中,括号内的代码声明一个类型与容器存储的内容相容的变量
 	//		然后指出了容器的名称,接下来,循环体使用指定的变量一次访问容器的每个元素
 	//		例如下述语句:
 	//			for_each(books.begin(),books.end(),ShowReview);
@@ -404,12 +408,12 @@ int main()
 	
 	//	泛型编程
 	/*
-		STL是一种泛型编程(generic programming)
+		STL 是一种泛型编程(generic programming)
 		面向对象编程关注的是编程的数据方面,而泛型编程关注的是算法
 		他们之间的共同点是抽象和创建可重用代码,但它们的理念绝然不同
 		泛型编程旨在编写独立于数据类型的代码
-		在C++中,完成通用程序的工具是模板
-		当然,模板使得能够按泛型定义函数或类,而STL通过通用算法更进了一步
+		在 C++ 中,完成通用程序的工具是模板
+		当然,模板使得能够按泛型定义函数或类,而 STL 通过通用算法更进了一步
 		模板让这一切成为可能,但必须对元素进行仔细设计
 
 		为何使用迭代器:
@@ -425,18 +429,18 @@ int main()
 				  即如果 p 和 q 都是迭代器,则应对 p==q 和 p!=q 进行定义
 				- 应能够使用迭代器遍历容器中的所有元素
 				  这可以通过为迭代器 p 定义 ++p 和 p++ 来实现
-			对于STL中的某个类,迭代器可能是指针;而对于另一个类,则可能是对象
-			唯一不同的是pr的类型
-			因此,STL通过为每个类定义适当的迭代器,并以统一的风格设计类
+			对于 STL 中的某个类,迭代器可能是指针;而对于另一个类,则可能是对象
+			唯一不同的是 pr 的类型
+			因此,STL 通过为每个类定义适当的迭代器,并以统一的风格设计类
 			能够对内部表示绝然不同的容器,编写相同的代码
-			使得C++11新增的自动类型推断可进一步简化:对于矢量或列表,都可以:
+			使得 C++11 新增的自动类型推断可进一步简化:对于矢量或列表,都可以:
 				for(auto pr = scores.begin();pr != scores.end();pr++)
 					cout << *pr << endl;
-			作为一种编程风格,最好避免直接使用迭代器,而应尽可能使用STL函数来处理细节
-			也可使用C++11新增的基于范围的for循环:
+			作为一种编程风格,最好避免直接使用迭代器,而应尽可能使用 STL 函数来处理细节
+			也可使用 C++11 新增的基于范围的 for 循环:
 				for(auto x : scores) cout << x << endl;
 
-			来总结下STL方法
+			来总结下 STL 方法
 			首先是处理容器的算法,应尽可能用通用的术语来表达算法,使之独立于数据类型和容器类型
 			为使通用算法能够适用于具体情况
 			应定义能够满足算法需求的迭代器,并把要求加到容器设计上
@@ -445,8 +449,8 @@ int main()
 
 	// 迭代器类型
 	/*
-		STL定义了5种迭代器,并根据所需的迭代器类型对算法进行了描述
-		这5种迭代器分别是:
+		STL 定义了 5 种迭代器,并根据所需的迭代器类型对算法进行了描述
+		这 5 种迭代器分别是:
 		输入迭代器、输出迭代器、正向迭代器、双向迭代器和随机访问迭代器
 		例如,find()的原型与下面类似:
 			template<class InputIterator, class T>
@@ -454,7 +458,7 @@ int main()
 		这指出,这种算法需要一个输入迭代器,同样,下面的原型指出排序算法需要一个随机访问迭代器:
 			template<class RandomAccessIterator>
 			void sort(RandomAccessIterator first, RandomAccessIterator last);
-		对于这5种迭代器,都可以执行解除引用操作,也可进行比较,看其相等还是不等
+		对于这 5 种迭代器,都可以执行解除引用操作,也可进行比较,看其相等还是不等
 		如果两个迭代器相同,则对它们执行解除引用操作得到的值将相同
 			iter1 == iter2
 			is true, then the following is also true:
@@ -471,19 +475,19 @@ int main()
 			输入迭代器是单向迭代器,可以递增,但不能倒退
 
 		2.输出迭代器
-			STL使用术语"输出"来只用于将信息从程序传出给容器的迭代器
+			STL 使用术语"输出"来只用于将信息从程序传出给容器的迭代器
 			因此程序的输出就是容器的输入
 			输出迭代器与输入迭代器相似,只是解除引用让程序能修改容器值,而不能读取
-			发送到显示器上的输出就是如此,cout可以修改发送到显示器的字符流
+			发送到显示器上的输出就是如此,cout 可以修改发送到显示器的字符流
 			却不能读取屏幕上的内容
-			STL足够通用,其容器可以表示输出设备,因此容器也可能如此
+			STL 足够通用,其容器可以表示输出设备,因此容器也可能如此
 			另外,如果算法不用读取做容器的内容就可以修改它(如通过生成要存储的新值)
 			则没有理由要求它使用能够读取内容的迭代器
 			简而言之,对于单通行、只读算法,可以使用输入迭代器
 			而对于单通行、只写算法,则可以使用输出迭代器
 
 		3.正向迭代器
-			与输入输出迭代器相似,正向迭代器只是用++运算符来遍历容器
+			与输入输出迭代器相似,正向迭代器只是用 ++ 运算符来遍历容器
 			所以它每次沿容器向前移动一个元素
 			然而,与输入输出迭代器不同的是,它总是按相同的顺序遍历一系列值
 
@@ -543,9 +547,8 @@ int main()
 	/*
 		1.将指针用作迭代器
 			迭代器是广义指针,而指针满足所有的迭代器要求
-			迭代器是STL算法的接口,而指针是迭代器,因此STL算法可以使用指针来对基于指针的
-			非STL容器进行操作
-
+			迭代器是 STL 算法的接口,而指针是迭代器,因此 STL 算法可以使用指针来对基于指针的
+			非 STL 容器进行操作
 
 			int casts[10] = {6, 2, 4, 5, 8, 3, 1, 8, 2, 1};
 			vector<int> dice(10);
@@ -555,9 +558,9 @@ int main()
 			前两个位置必须是(或最好是)输入迭代器,最后一个必须是(或最好是)输出迭代器
 
 			现要将信息复制到显示器上
-			STL为这种迭代器提供了 ostream_iterator 模板
-			用STL的话说,该模板是输出迭代器概念的一个模型
-			它也是一个适配器(adapter) ---- 一个类或函数,可以将一些其他接口转换为STL使用的接口
+			STL 为这种迭代器提供了 ostream_iterator 模板
+			用 STL 的话说,该模板是输出迭代器概念的一个模型
+			它也是一个适配器(adapter) ---- 一个类或函数,可以将一些其他接口转换为 STL 使用的接口
 			可以通过包含头文件 iterator 并作下面的声明来创建这种迭代器:
 				#inlcude<iteartor>
 				...
@@ -593,22 +596,275 @@ int main()
 			头文件 iterator 提供了一些专用的预定义迭代器类型:
 				reverse_iterator、back_iterator、front_insert_iterator 和 insert_iterator
 
+			reverse_iterator:
+				对 reverse_iterator 执行递增操作将导致它被递减
+				不直接对常规迭代器进行递减的主要原因是为了简化对已有函数的使用
+				假设显示 dice 容器的内容，可:
+
+					ostream_iterator<int, char> out_iter(cout, " ");
+					copy(dice.begin(), dice.end(), out_iter);
+
+				现假设反向打印内容，vertor 类有一个名为 rbegin() 和一个名为 rend() 的成员函数
+				分别返回指向超尾的反向迭代器和指向第一个元素的反向迭代器:
+
+					copy(dice.rbegin(), dice.rend(), out_iter);
+
+				注意:
+					rbegin() 和 end() 返回相同的值(超尾)，但类型不同(reverse_iterator 和 iterator)
+					同样, rend() 和 begin() 也返回相同的值(指向第一个元素的迭代器)，但类型不同
+
+				必须对反向迭代器做一种特殊补偿
+				假设 rp 是一个被初始化为 dice.rbegin() 的反转指针
+				那么 *rp 是什么呢?
+				因为 rbegin() 返回超尾，因此不能对该地址进行解除引用
+				同样，如果 rend() 是第一个元素的位置，则 copy() 必须提早一个位置停止
+				因为区间的结尾处不包括在区间中
+				
+				反向指针通过先递减，在接触引用解决了这两个问题
+				copyit_cpp() 演示了如何使用 copy()、istream 迭代器和反向迭代器
+
 	*/
-	std::ostream_iterator<int, char> out_iter(std::cout, " ");
-	*out_iter = 15;
-	*out_iter++ = 16;
+	if (false) copyit_cpp();
+	/*
+				需调整目标容器长度时
+				三种插入迭代器通过将复制转换为插入解决了这些问题
+				插入将添加新的元素，而不会覆盖已有的数据，并使用自动内存分配来确保能够容纳新的信息
 
-	int casts[10] = { 6, 2, 4, 5, 8, 3, 1, 8, 2, 1 };
-	std::vector<int> dice(10); 
+				back_insert_iterator 将元素插入到容器尾部
+				front_insert_iterator 将元素插入到容器的前端
+				insert_iterator 将元素插入到 insert_iterator 构造函数的参数指定的位置前面
 
-	std::copy(casts, casts + 10, dice.begin());
+				这三个插入迭代器都是输出容器概念的模型
 
-	std::copy(dice.begin(), dice.end(), std::ostream_iterator<int, char>(std::cout," "));
+				存在一些限制:
+					back_insert_iterator 只能用于允许在尾部快速插入的容器, vector 类符合这种要求
+					front_insert_iterator 只能用于允许在起始位置做时间固定插入的容器类型, vector 类不符合, queue 类符合
+					insert_iterator 没有这些限制,因此可以用它把信息插入到矢量的前端
+					然而,front_insert_iterator 对于那些支持它的容器来说，完成任务的速度更快
 
-	std::copy(std::istream_iterator<int, char>(std::cin),
-		std::istream_iterator<int, char>(), dice.begin());
+				这些迭代器将容器类型作为模板参数，将实际的容器标识符作为构造函数参数
+				要为名为 dice 的 vector<int> 容器创建一个 back_insert_iterator :
+					back_insert_iterator<vector<int>> back_iter(dice);
+				必须声明容器类型的原因是,迭代器必须使用合适的容器方法
+				front_insert_iterator 的方式与此相同
+				对于 insert_iterator 声明,还需要一个指示插入位置的构造函数参数:
+					insert_iterator<vector<int>> insert_iter(dice, dice.begin());
 
-	std::copy(dice.begin(), dice.end(), std::ostream_iterator<int, char>(std::cout, " "));
+				程序 insert_cpp() 演示了这两种迭代器的用法, 还是用 for_each() 而不是 ostream 迭代器进行输出
+	*/
+	if(false) inserts_cpp();
+
+	// 容器种类
+	/*
+		STL 具有容器概念和容器类型
+		概念是具有名称(如容器、序列容器、关联容器)的通用类别
+		容器类型是可用于创建具体容器对象的模板
+
+		以前的 11 个容器类型分别是 deque, list, queue, priority_queue, stack, vector, map, multimap,
+		set, multiset 和 bitset (本章不讨论 bitset,它是在比特级处理数据的容器)
+		C++11 新增了 forward_list, unordered_map, unordered_multimap, unordered_set 和 unordered_multiset
+
+		1. 容器概念:
+			没有与基本容器概念对应的类型，但概念描述了所有容器类都通用的元素
+			它是一个概念化的抽象基类----说它概念化，是因为容器类并不真正使用继承机制
+			换句话说，容器概念指定了所有 STL 容器类都必须满足的一系列要求
+
+			不能将任何类型的对象存储在容器中,具体地说,类型必须是可复制构造的和可赋值的
+			基本类型满足这些要求,只要类定义没有将复制构造函数和赋值运算符声明为私有或保护的
+			则也满足这种要求
+			C++11 改进了这些概念,添加了术语可复制插入(CopyInsertable)和可移动插入(MoveInsertable),但这里只进行简单的概述
+
+			基本容器不能保证其元素都按特定的顺序存储,也不能保证元素的顺序不变
+			但对概念进行改进后,则可以增加这样的保证
+			所有容器都提供某系特征和操作,下表对一些通用特征进行了总结
+			其中,X 表示容器类型,如 vector
+			T 表示存储在容器中的对象类型
+			a, b 表示类型为 X 的值
+			r 表示类型为 X& 的值
+			u 表示类型为 X 的标识符(即如果 X 表示 vector<int>,则 u 是一个 vector<int> 对象)
+
+表达式				返回类型						说明										复杂度
+X::iterator			指向 T 的迭代器类型				满足正向迭代器要求的任何迭代器				编译时间
+X::value_type		T								T 的类型									编译时间
+X u													创建一个名为 u 的空容器						固定
+X()													创建一个匿名的空容器						固定
+X u(a)												调用复制构造函数后 u == a					线性
+X u = a												作用同 X u(a)		 						线性
+r = a				X&								调用赋值运算符后 r == a						线性
+(&a)->~X()			void							对容器中每个元素应用析构函数				线性
+a.begin()			迭代器							返回指向容器第一个元素的迭代器				固定
+a.end()				迭代器							返回超尾值迭代器							固定
+a.size()			无符号整型						返回元素个数,等价于 a.end()-a.begin()		固定
+a.swap(b)			void							交换 a 和 b 的内容							固定
+a == b				可转换为 bool					如果 a 和 b 元素长度相同,且 a 中每个		线性
+													元素都等于(== 为真)b 中相应的元素,则
+													为真
+a != b				可转换为 bool					返回 !(a==b)								线性
+
+			表中的"复杂度"一列描述了执行操作所需的时间
+			这个表列出了 3 中可能性,从快到慢依次为:
+				- 编译时间
+				- 固定时间
+				- 线性时间
+
+			如果复杂度为编译时间,则操作将在编译时执行,执行时间为 0
+			固定复杂度意味着操作在运行阶段,但独立于对象中的元素数目
+			线性复杂度意味着时间与元素数目成正比
+		
+			复杂度要求是 STL 特征,虽然实现细节可以隐藏,但性能规格应公开
+			以便程序员能都知道完成特定操作的计算成本
+
+		2. C++11 新增的容器要求
+			下表列出了 C++11 新增的通用容器要求
+			在这个表中,rv 表示类型为 X 的非常量右值,如函数的返回值
+
+表达式				返回类型						说明										复杂度
+X u(rv)												调用移动构造函数后,u 的值与 rv 的			线性
+													原始值相同
+X u = rv											作用同 X u(rv)
+a = rv				X&								调用移动赋值运算符后,u 的值与 rv			线性
+													的原始值相同
+a.cbegin()			const_iterator					返回指向容器第一个元素的 const 迭			固定
+													代器
+a.cend()			const_iterator					返回超尾值 const 迭代器						固定
+
+			复制构造和赋值赋值以及移动构造和移动赋值之间的差别在于
+			复制操作保留源对象,而移动操作可修改源对象,还可能转让所有权,而不做任何复制
+			如果源是临时的,移动操作的效率将高于常规复制
+
+		3. 序列
+			可以通过添加要求来改进基本的容器概念
+			序列(sequence)是一种重要的改进
+			因为 7 中 STL 容器类型(deque、forward_list、queue、priority_queue、stack 和 vector)
+			都是序列
+			序列概念增加了迭代器至少是正向迭代器这样的要求
+			这保证元素将按特定顺序排列,不会再两次迭代之间发生变化
+			array 也被归类到序列容器,虽然它并不满足序列的所有要求
+
+			序列还要求其元素按严格的线性顺序排序,即存在第一个元素、最后一个元素
+			除第一个元素和最后一个元素外,每个元素前后都分别有一个元素
+			数字和链表是序列,但分支结构不是
+
+			下表列出了序列必须完成的操作
+			t 表示类型为 T(存储在容器中值的类型)的值
+			n 表示整数,p、q、i 和 j 表示迭代器
+
+表达式					返回类型						说明
+X a(n, t)												声明一个名为 a 的由 n 个 t 值组成的序列
+X(n, t)													创建一个由 n 个 t 值组成的匿名序列
+X a(i, j)												声明一个名为 a 的序列,并将其初始化为区间[i, j)的内容
+X(i, j)													创建一个匿名序列,并将其初始化为区间[i, j)的内容
+a.insert(p, t)			迭代器							将 t 插入到 p 的前面
+a.insert(p, n, t)		void							将 n 个 t 插入到 p 的前面
+a.insert(p, i, j)		void							将区间 [i, j) 中的元素插入到 p 的前面
+a.erase(p)				迭代器							删除 p 指向的元素
+a.erase(p, q)			迭代器							删除 [p, q) 中的元素
+a.clear()				void							等价于 erase(begin(), end())
+
+			因为模板类 deque、list、queue、priority_queue、stack 和 vector 都是序列概念模型
+			所以它们都支持上表操作,除此之外还可使用其他操作,在允许情况下,它们的复杂度为固定时间
+			下表列出了其他操作
+
+表达式					返回类型					含义						容器
+a.front()				T&							*a.begin()					vector、list、deque
+a,back()				T&							*--a.end()					vector、list、deque
+a.push_front(t)			void						a.insert(a.begin(), t)		list、deque
+a.push_back(t)			void						a.insert(a.end(), t)		vector、list、deque
+a.pop_front(t)			void						a.erase(a.begin())			list、deque
+a.pop_back(t)			void						a.erase(--a.end())			vector、list、deque
+a[n]					T&							*(a,begin()+n)				vector、deque
+a.at(t)					T&							*(a,begin()+n)				vector、deque
+
+			a[n] 和 a.at(n) 的区别在于,如果 n 落在容器的有效区外,则 a.at(n) 将执行边界检查,并引发
+			out_of_range 异常
+
+			下面介绍这 7 中序列容器类型
+			(1) vector
+				该模板是在 vector 头文件中声明的
+				简单地说,vector 是数组的一种类表示,它提供自动内存管理功能
+				可以动态的改变 vector 对象的长度
+				并随着元素的添加和删除而增大和缩小
+				它提供对元素的随机访问
+				在尾部添加和删除元素的时间是固定的
+				但在头部或中间插入和删除元素的复杂度为线性时间
+				除序列外,vector 还是 可反转容器(reversible container) 概念的模型
+				这增加了两个类方法: rbegin() 和 rend()
+				前者返回一个指向反转序列的第一个元素的迭代器
+				后者返回反转序列的超尾迭代器
+				例如,Show(int)	是显示一个整数的函数:
+					for_each(dice.begin(), dice.end(), Show);		// display in order
+					cout << endl;
+					for_each(dice.rbegin(), dice.rend(), Show);		// display in reversed order
+					cout << endl;
+				这两中方法返回的迭代器都是类级类型 reverse_iterator
+
+			(2) deque
+				deque 模板类在 deque 头文件中声明,表示双端队列(double-ended queue)
+				通常被简称为 deque
+				在 STL 中,其实现类似于 vector 容器,支持随机访问
+				主要区别在于,从 deque 对象的开始位置插入和删除元素的时间是固定的
+				为实现 deque 两端执行插入和删除操作的时间为固定这一目的
+				deque 对象的设计比 vector 对象更为复杂
+				因此随机访问和序列中部插入和删除操作 vector 速度要快些
+
+			(3) list
+				list 模板类在 list 头文件中声明,表示双向链表
+				除第一个和最后一个元素外,每个元素都与前后的元素相链接
+				这意味这可以双向遍历链表
+				和 vector 的关键区别在于,list 在链表中任一位置进行插入和删除的时间都是固定的
+				因此,vector 强调的是通过随机访问进行快速访问,而 list 强调的是元素的快速插入
+				list 也是可反转容器
+				与 vector 不同的是,list 不支持数组表示法和随机访问
+				与矢量迭代器不同,从容器中插入或删除元素之后,链表迭代器指向元素将不变
+				除序列和可反转容器的函数外,list 模板类还包含了链表专用的成员函数
+				下表列出了其中一些(附录 G 包含完整列表)
+				通常不必担心 Alloc 模板参数,因为它有默认值
+
+函数												说明
+void merge(list<T, Alloc>& x)						将链表 x 与调用链表合并,这两个链表必已经排序
+													合并后的经过排序的链表保存在调用链表中,x 为空
+													这个函数的复杂度为线性
+void remove(const T& val)							从链表中删除 val 的所有实例,这个函数的复杂度为线性时间
+void sort()											使用 < 运算符对来链表进行排序: N 个元素的复杂度为 NlogN
+void splice(iterator pos, list<T, Alloc>x)			将链表 x 的内容插入到 pos 的前面,x 将为空
+													这个函数的复杂度为固定时间
+void unique()										将连续的相同元素压缩为单个元素
+													这个函数的复杂度为线性时间
+
+				程序 list_cpp() 演示了这些方法
+	*/
+	if (false)	list_cpp();
+	/*
+				insert() 和 splice() 的主要区别在于: insert() 将原始区间的副本插入到目标地址
+				而 splice() 则将原始区间移到目标地址
+				splice() 执行后,迭代器仍有效
+				还有非成员 sort() 函数,但它需要随机访问迭代器
+				因为快速插入的代价是放弃随机访问功能
+				所以不能将非成员函数 sort() 用于链表
+				因此,这个类中包含了一个只能在类中使用的成员版本
+
+				list 工具箱
+					
+	*/
+
+
+	if (false) {
+		std::ostream_iterator<int, char> out_iter(std::cout, " ");
+		*out_iter = 15;
+		*out_iter++ = 16;
+
+		int casts[10] = { 6, 2, 4, 5, 8, 3, 1, 8, 2, 1 };
+		std::vector<int> dice(10);
+
+		std::copy(casts, casts + 10, dice.begin());
+
+		std::copy(dice.begin(), dice.end(), std::ostream_iterator<int, char>(std::cout, " "));
+
+		std::copy(std::istream_iterator<int, char>(std::cin),
+			std::istream_iterator<int, char>(), dice.begin());
+
+		std::copy(dice.begin(), dice.end(), std::ostream_iterator<int, char>(std::cout, " "));
+	}
 
 	return 0;
 }
@@ -995,4 +1251,99 @@ bool worseThan(const Review& r1, const Review& r2)
 		return true;
 	else
 		return false;
+}
+
+void copyit_cpp()
+{// copyit.cpp -- copy() and iterator
+	
+	using namespace std;
+
+	int casts[10] = { 6, 7, 2, 9, 4, 11, 8, 7, 10, 5 };
+	std::vector<int> dice(10);
+	// copy from array to vertor
+	copy(casts, casts + 10, dice.begin());
+	cout << "Let the dice be cast!\n";
+	// create an ostream iterator
+	ostream_iterator<int, char> out_iter(cout, " ");
+	// copy from vector to output
+	copy(dice.begin(), dice.end(), out_iter);
+	cout << endl;
+	cout << "Implict use of reverse iterator.\n";
+	copy(dice.rbegin(), dice.rend(), out_iter);
+	cout << endl;
+	cout << "Explicit use of reverse iterator.\n";
+	vector<int>::reverse_iterator ri;
+	for (ri = dice.rbegin(); ri != dice.rend(); ++ri)
+		cout << *ri << " ";
+	cout << endl;
+}
+
+void output(const std::string& s) { std::cout << s << " "; }
+
+void inserts_cpp()
+{// inserts.cpp -- copy() and insert iterators
+
+	using namespace std;
+
+	string s1[4] = { "fine", "fish", "fashion", "fate" };
+	string s2[2] = { "busy", "bats" };
+	string s3[2] = { "silly", "singers" };
+
+	vector<string> words(4);
+	copy(s1, s1 + 4, words.begin());
+	for_each(words.begin(), words.end(), output);
+	cout << endl;
+
+// construct anonymous back_insert_iterator object
+	copy(s2, s2 + 2, back_insert_iterator<vector<string>>(words));
+	for_each(words.begin(), words.end(), output);
+	cout << endl;
+
+// construct anonymous insert_iterator object
+	copy(s3, s3 + 2, insert_iterator<vector<string>>(words, words.begin()));
+	for_each(words.begin(), words.end(), output);
+	cout << endl;
+}
+
+void outint(int n) { std::cout << n << " "; }
+
+void list_cpp()
+{// list.cpp -- using a list
+	using namespace std;
+
+	list<int> one(5, 2);		// list of 5 2s
+	int stuff[5] = { 1, 2, 4, 8, 6 };
+	list<int> two;
+	two.insert(two.begin(), stuff, stuff + 5);
+	int more[6] = { 6, 4, 2, 4, 6, 5 };
+	list<int> three(two);
+	three.insert(three.end(), more, more + 6);
+
+	cout << "List one: ";
+	for_each(one.begin(), one.end(), outint);
+	cout << endl << "List two: ";
+	for_each(two.begin(), two.end(), outint);
+	cout << endl << "List three: ";
+	for_each(three.begin(), three.end(), outint);
+	three.remove(2);
+	cout << endl << "List three minus 2s: ";
+	for_each(three.begin(), three.end(), outint);
+	three.splice(three.begin(), one);
+	cout << endl << "List three after splice: ";
+	for_each(three.begin(), three.end(), outint);
+	cout << endl << "List one: ";
+	for_each(one.begin(), one.end(), outint);
+	three.unique();
+	cout << endl << "List three after unique: ";
+	for_each(three.begin(), three.end(), outint);
+	three.sort();
+	three.unique();
+	cout << endl << "List three after sort & unique: ";
+	for_each(three.begin(), three.end(), outint);
+	two.sort();
+	three.merge(two);
+	cout << endl << "Sorted two merged into three: ";
+	for_each(three.begin(), three.end(), outint);
+	cout << endl;
+	// cin.get();
 }
