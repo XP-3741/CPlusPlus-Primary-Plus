@@ -9,6 +9,7 @@
 #include<algorithm>
 #include<iterator>
 #include<list>
+#include<set>
 
 void str1_cpp();
 void strfile_cpp();
@@ -23,6 +24,7 @@ void vect3_cpp();
 void copyit_cpp();
 void inserts_cpp();
 void list_cpp();
+void setops_cpp();
 
 int main()
 {
@@ -844,8 +846,103 @@ void unique()										将连续的相同元素压缩为单个元素
 				因此,这个类中包含了一个只能在类中使用的成员版本
 
 				list 工具箱
-					
+					list 方法组成了一个方便的工具箱
+					sort()、merge()和 unique()方法还各自拥有接受另一个参数的版本
+					该参数用于指定用来比较元素的函数
+					remove()方法也有一个接受另一个参数的版本
+					该参数用于指定用来确定是否删除元素的函数
+					这些参数都是谓词函数
+
+			(4) forward_list
+				C++11 新增的容器类 forward_list,它实现了单链表
+				forward_list 只需要正向迭代器,而不需要双向迭代器
+				是不可反转容器
+
+			(5) queue
+				queue 模板类在头文件 queue 中声明，是一个适配器类
+				由钱所述,ostream_iterator 模板就是一个适配器
+				让输出流能够使用迭代器接口
+				同样,queue 模板让底层类(默认为 deque)展示典型的队列接口
+				queue 模板的限制比 deque 更多
+				它不仅不允许随机访问队列元素,甚至不允许遍历队列
+
+						queue 的操作
+方法								说明
+bool empty()const				如果队列为空,则返回 true;否则返回 false
+size_type size()const			返回队列中元素的数目
+T& front()						返回指向队列首元素的引用
+T& back()						返回指向队列尾元素的引用
+void push(const T& x)			在队尾插入 x
+void pop()						删除队首元素
+
+			(6) priority_queue
+				priority_queue 模板类在 queue 头文件中声明,是一个适配器类
+				它支持的操作与 queue 相同
+				两者之间的主要区别在于,在 priority_queue 中,
+				最大的元素被移到队首
+				内部的区别在于,默认的底层类是 vector
+				可以修改用于确定哪个元素放到队首的比较方式
+				方法是提供一个可选的构造函数参数:
+					priority_queue<int>	pq1;					// default version
+					priority_queue<int>	pq2(greater<int>);		// use greater<int> to order
+				
+				greater<int>() 函数是一个预定义的函数对象	
+
+			(7) stack
+				stack 在头文件 stack 中声明,也是个适配器类
+				它给底层(默认情况下为 vector)提供典型的栈接口
+				stack 模板的限制比 vector 更多
+				它不仅不允许随机访问栈元素,甚至不允许遍历栈
+
+							stack 的操作
+方法								说明
+bool empty()const				如果栈为空,则返回 true;否则返回 false
+size_type size()const			返回栈中元素的数目
+T& top()						返回指向栈顶元素的引用
+void push(const T& x)			在栈顶部插入 x
+void pop()						删除栈顶元素
+
+			(8) array
+				第 4 章介绍过
+				模板类 array 是头文件 array 中定义的,它并非 STL 容器
+				因为其长度是固定的,因此,array 没有定义调整容器大小的操作
+				但定义了对它来说有意义的成员函数,如 operator[]() 和 at()
+				可将很多标准 STL 算法用于 array 对象,如 copy() 和 for_each()
+		
+		4. 关联容器
+			关联容器(associative container)是对容器概念的另一个改进
+			关联容器将值与键关联在一起,并使用键来查找值
+			例如,值可以是表示雇员信息的结构,而键可以是唯一的员工编号
+			为获取雇员信息,程序使用键查找雇员结构
+			前面说过,对于容器 X,表达式 X::value_type 通常指出了存储在容器中值的类型
+			对于关联容器来说,表达式 X::key_type 指出了键的类型
+
+			关联容器的优点在于,它提供了对元素的快速访问
+			与序列相似,关联容器也允许插入新元素
+			但不能指定元素的插入位置,原因是
+			关联容器通常有用于确定数据放置位置的算法,以便能够快速检索信息
+
+			关联容器通常是使用某种树实现的
+
+			STL 有四种关联容器: set、multiset、map 和 multimap
+			前两种是在头文件 set 中定义的
+			后两种是在头文件 map 中定义的
+
+			最简单的关联容器是 set,其值类型与键相同,键是唯一的
+			这意味着集合中不会有多个相同的键,对 set 来说,值就是键
+			multiset 类似于 set,只是可能有多个值的键相同
+
+			在 map 中,值与键的类型不同,键是唯一的,每个键对应一个值
+			multimap 与 map 类似,只是一个键可以与多个值相关联
 	*/
+			// [1] set 示例
+			/*
+				STL set 模拟了多个概念,它是关联集合,可反转,可排序,且键是唯一的,所以不能存储多个相同的值
+				程序 setops_cpp() 演示一些操作 
+			*/
+	if (true)	setops_cpp();
+
+			// [2] multimap 示例
 
 
 	if (false) {
@@ -1345,5 +1442,90 @@ void list_cpp()
 	cout << endl << "Sorted two merged into three: ";
 	for_each(three.begin(), three.end(), outint);
 	cout << endl;
+	// cin.get();
+}
+void setops_cpp()
+{// setops.cpp -- some set operations
+	using namespace std;
+
+	const int N = 6;
+	string s1[N] = { "buffoon", "thinkers", "for", "heavy", "can", "for" };
+	string s2[N] = { "metal", "any", "food", "elegant", "deliver","for" };
+
+	// 与 vector 和 list 相似,set 也是用模板参数，来指定要存储的值类型
+	//		set<string> A
+	// 第二个模板参数是可选的,用于指示用来对键进行排序的比较函数或对象
+	// 默认情况下将使用模板 less<>
+	//		set<string, less<string>> A;
+	
+	set<string> A(s1, s1 + N);
+	set<string> B(s2, s2 + N);
+	// set 也有一个将迭代器区间作为参数的构造函数
+	// 这提供了一种将集合初始化为数组内容的简单方法
+
+	ostream_iterator<string, char> out(cout, " ");
+	cout << "Set A: ";
+	copy(A.begin(), A.end(), out);
+	cout << endl << endl;
+	cout << "Set B: ";
+	copy(B.begin(), B.end(), out);
+	cout << endl << endl;
+	// 上述代码的输出表明,键是唯一的
+
+	// 数学为集合定义了一些标准操作,例如,并集包含两个集合合并后的内容
+	// 交集包含两个集合都有的元素
+	// 两个集合的差是第一个集合减去两个集合都有的元素
+	// STL 提供了支持这些操作的算法
+	// 它们是通用函数,而不是方法
+	// 所有 set 对象都自动满足使用这些算法的先决条件,即容器是经过排序的
+
+	cout << "Union of A and B:\n";
+	set_union(A.begin(), A.end(), B.begin(), B.end(), out);
+	cout << endl << endl;
+	// set_union() 求集合的并集
+	// 接受五个参数: 
+	// 前两个迭代器定义了第一个集合的区间
+	// 接下来的两个迭代器定义了第二个集合的区间
+	// 最后一个迭代器是输出迭代器
+	
+	cout << "Intersection of A and B:\n";
+	set_intersection(A.begin(), A.end(), B.begin(), B.end(), out);
+	cout << endl << endl;
+	// set_intersection()函数查找交际
+
+	cout << "Difference of A and B:\n";
+	set_difference(A.begin(), A.end(), B.begin(), B.end(), out);
+	cout << endl << endl;
+	// set_difference()函数获得两个集合的差
+
+	set<string> C;
+	cout << "Set C:\n";
+	set_union(A.begin(), A.end(), B.begin(), B.end(),
+		insert_iterator<set<string>>(C, C.begin()));
+	copy(C.begin(), C.end(), out);
+	cout << endl << endl;
+	// 假设要将结果放在集合 C 中,则最后一个参数应是一个指向 C 的迭代器
+	// 显而易见选择 C.begin(),但不管用
+	// 原因:
+	// 首先,关联集合将键看作常量,所以 C.begin() 返回迭代器是常量迭代器,不能用作输出迭代器
+	// 第二个原因,与 copy() 相似,set_union() 将覆盖容器中已有的数据
+	// 并要求容器有足够的空间容纳新信息
+	// C 是空的,不能满足这种要求
+	// 但用模板 insert_iterator 可以解决这两个问题
+
+	string s3("grungy");
+	C.insert(s3);
+	cout << "Set C after insertion:\n";
+	copy(C.begin(), C.end(), out);
+	cout << endl << endl;
+	// 排序决定了插入的位置,所以这种类包含只指定要插入的信息
+	// 而不指定位置的插入方法
+
+	cout << "Showing a range:\n";
+	copy(C.lower_bound("ghost"), C.upper_bound("spook"), out);
+	cout << endl << endl;
+	// 方法 lower_bound() 将键作为参数并返回一个指向集合中第一个不小于键参数的成员的迭代器
+	// 方法 upper_bound() 将键作为参数并返回一个指向集合中第一个大于键参数的成员的迭代器
+
 	// cin.get();
 }
