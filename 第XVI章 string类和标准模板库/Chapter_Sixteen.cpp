@@ -10,6 +10,7 @@
 #include<iterator>
 #include<list>
 #include<set>
+#include<map>
 
 void str1_cpp();
 void strfile_cpp();
@@ -25,6 +26,8 @@ void copyit_cpp();
 void inserts_cpp();
 void list_cpp();
 void setops_cpp();
+void multmap_cpp();
+void functor_cpp();
 
 int main()
 {
@@ -940,10 +943,155 @@ void pop()						删除栈顶元素
 				STL set 模拟了多个概念,它是关联集合,可反转,可排序,且键是唯一的,所以不能存储多个相同的值
 				程序 setops_cpp() 演示一些操作 
 			*/
-	if (true)	setops_cpp();
+	if (false)	setops_cpp();
 
 			// [2] multimap 示例
+			/*
+				与 set 相似,multimap 也是可反转的、经过排序的关联容器
+				但键和值的类型不同,且同一个键可能与多个值相关联
+				基本的 multimap 声明使用模板参数指定键的类型和存储的值的类型
+				例如,下面的声明创建一个 multimap 对象,其中键类型为 int,存储值类型为 string:
+					multimap<int, string> codes;
+				第 3 个模板参数是可选的,指出用于对键进行排序的比较函数或对象
+				默认情况下,将使用模板 less<>,该模板将键类型作为参数
 
+				为将信息结合在一起,实际的值类型将键类型和数据类型结合为一对
+				为此,STL 使用模板类 pair<class T, class U> 将这两种值存储到一个对象中
+				如果 keytype 是键类型,而 datatype 是存储的数据类型
+				则值类型为 pair<const keytype, datatype>
+				例如,假设要用区号作为键来存储城市名,则一种方法是创建一个 pair,在将它插入:
+					pair<const int, string> item(213, "Los Angeles");
+					codes.insert(item);
+				也可使用一条语句创建匿名 pair 对象并将它插入:
+					codes.insert(pair<const int, string> (213, "Los Angeles");
+
+				因为数据项是按键排序的,所以不需要指出插入位置
+
+				对于 pair 对象,可以使用 first 和 second 成员来访问其两个部分:
+					pair<const int, string> item(213, "Los Angeles");
+					cout << item.first << ' ' << item.second <<endl;
+
+				获得有关 multimap 对象的信息:
+				成员函数 count() 接受键作为参数,并返回具有该键的元素数目
+				成员函数 lower_bound() 和 upper_bound() 将键作为参数
+				且工作原理与处理 set 时相同
+				成员函数 equal_range() 用键作为参数,且返回两个迭代器,它们表示的区间与该键匹配
+				为返回两个值,该方法将它们封装在一个 pair 对象中
+				这里 pair 的两个模板参数都是迭代器
+			*/
+	if (false) multmap_cpp();
+		
+	/*
+		5. 无序关联容器
+			无序关联容器是对容器概念的另一种改进
+			与关联容器一样,无序关联容器也将值与键关联起来,并使用键来查找
+			但底层差别在于,关联容器是基于树结构的
+			而无序关联容器是基于数据结构哈希表的
+			这旨在提高添加和删除元素的速度以及提高查找算法的效率
+			有 4 中无序关联容器,它们是
+			unordered_set、unordered_multiset、unordered_map 和 unordered_multimap
+			附录 G 有更详细介绍
+	*/
+
+	// 函数对象
+	/*
+		很多 STL 算法都是用函数对象----也叫函数符(functor)
+		函数符是可以以函数方式与 () 结合使用的任意对象
+		这包括函数名、指向函数的指针和重载了()运算符的类对象
+		例如:
+			class Linear
+			{
+			private:
+				double slope;
+				double y0;
+			public:
+				Linear(double s1_ = 1, double y_ = 0)
+					: slope(s1_), y0(y_) {}
+				double operator()(double x) {return y0 + slope * x;}
+			};
+		这样,重载()运算符将使得能够像这样使用 Linear 对象:
+			Linear f1;
+			Linear f2(2.5, 10.0);
+			double y1 = f1(12.5);	// right-hand side is f1.operator()(12.5)
+			double y2 = f2(0.4);
+
+		for_each() 函数第 3 个参数可以是常规函数，也可以是函数符
+		这就提出了一个问题: 如何声明第 3 个参数
+		不能把它声明为函数指针,因为函数指针指定了参数类型
+		由于容器可以包含任意类型,所以预先无法直到使用哪种类型参数
+		STL 通过使用模板解决了这个问题
+		for_each 的原型看上去就像这样:
+			template<class InputIterator, class Function>
+			Function for_each(InputIterator first, InputIterator last, Function f);
+		ShowReview() 的原型如下:
+			void ShowReview(const Review &);
+		这样,标识符 ShowReview 的类型将为 void(*)(const Review &)
+		这也是赋给模板参数 Function 的类型
+
+		对于不同的函数调用, Function 参数可以表示具有重载的 () 运算符的类类型
+		最终,for_each() 代码将就具有一个使用 f() 的表达式
+		在 ShowReview() 示例中, f 是指向函数的指针,而 f() 调用该函数
+		如果最后的 for_each() 参数是一个对象,则 f() 将是调用其重载的 () 运算符的对象 
+
+			1. 函数符概念
+				正如 STL 定义容器和迭代器的概念一样,它也定义了函数符概念
+					- 生成器(generator) 是不用参数就可以调用的函数符
+					- 一元函数(unary function) 是用一个参数可以调用的函数符
+					- 二元函数(binary function) 是用两个参数可以调用的函数符
+						例如,提供给 for_each() 的函数符应当是一元函数,因为它每次用于一个容器元素
+						当然,这些概念都有相应的改进版:
+					- 返回 bool 值的一元函数是 谓词(predicate)
+					- 返回 bool 值的二元函数是 二元谓词(binary predicate)
+
+						一些 STL 函数需要谓词参数或二元谓词参数
+						例如,程序清单 16.9 使用 sort() 的这样一个版本,即将二元谓词作为其第3个参数:
+							bool WorseThan(const Review & r1, const Review & r2);
+							...
+							sort(books.begin(), books.end(), WorseThan);
+
+						list 模板有一个将谓词作为参数的 remove_if() 成员
+						该函数将谓词应用于区间中的每个元素
+						如果谓词返回 true,则删除这些元素
+						例如,下面的代码删除链表 three 中所有大于 100 的元素:
+							bool tooBig(int n) { return n > 100; }
+							list<int> scoree;
+							...
+							scores.remove_if(tooBig);
+
+						程序 functor_cpp() 演示了类 TooBig 一个值(V)作为函数参数传递
+						而第二个参数(cutoff)是由类构造函数设置的
+						有了该定义后,就可以将不同的 TooBig 对象初始化为不同的取舍值
+	*/
+	if (false) functor_cpp();
+	/*
+						假设有一个接受两个参数的模板函数:
+							template <class T>
+							bool tooBig(const T& val, const T& lim)
+							{
+								return val > lim;
+							}
+						则可以使用类将它转换为单个参数的函数对象:
+							template<class T>
+							class TooBig2
+							{
+							private:
+								T cutoff;
+							public:
+								TooBig2(const T& t) : cutoff(t) {}
+								bool operator()(const T& v) {return tooBig<T>(v, cutoff);}
+							};
+						即可以这样做:
+							TooBig2<int> tB100(100);
+							int x;
+							cin >> x;
+							if(TooBig2(x))	// same as if(tooBig(x, 100))
+								...
+						类函数符 TooBig2 是一个函数适配器,使函数能够满足不同的接口
+
+			2. 预定义的函数符
+				STL 定义了多个基本函数符,它们执行诸如将两个值相加、比较两个值是否相等等操作
+				提供这些函数对象是为了支持将函数作为参数的 STL 函数
+	*/
 
 	if (false) {
 		std::ostream_iterator<int, char> out_iter(std::cout, " ");
@@ -1528,4 +1676,83 @@ void setops_cpp()
 	// 方法 upper_bound() 将键作为参数并返回一个指向集合中第一个大于键参数的成员的迭代器
 
 	// cin.get();
+}
+
+typedef int KeyType;
+typedef std::pair<const KeyType, std::string> Pair;
+typedef std::multimap<KeyType, std::string> MapCode;
+
+void multmap_cpp()
+{// multmap.cpp -- use a multimap
+	using namespace std;
+	MapCode codes;
+	
+	codes.insert(Pair(415, "San Francisco"));
+	codes.insert(Pair(510, "Oakland"));
+	codes.insert(Pair(718, "Brooklyn"));
+	codes.insert(Pair(718, "Staten Island"));
+	codes.insert(Pair(415, "San Rafael"));
+	codes.insert(Pair(510, "Berkeley"));
+
+	cout << "Number of cities with area code 415: "
+		<< codes.count(415) << endl;
+	cout << "Number of cities with area code 718: "
+		<< codes.count(718) << endl;
+	cout << "Number of cities with area code 510: "
+		<< codes.count(510) << endl;
+	cout << "\nArea Code   City\n";
+	MapCode::iterator it;
+	for (it = codes.begin(); it != codes.end(); ++it)
+		cout << "    " << (*it).first << "    "
+		<< (*it).second << endl;
+
+	pair<MapCode::iterator, MapCode::iterator> range
+		= codes.equal_range(718);
+	cout << "\nCities with area code 718:\n";
+	for (it = range.first; it != range.second; ++it)
+		cout << (*it).second << endl;
+
+	// cin.get();
+}
+
+template<class T>	// functor class defines operator()()
+class TooBig
+{
+private:
+	T cutoff;
+public:
+	TooBig(const T& t) : cutoff(t) {}
+	bool operator()(const T& v) { return v > cutoff; }
+};
+
+void functor_cpp()
+{// functor.cpp -- using a functor
+	using std::list;
+	using std::cout;
+	using std::endl;
+	using std::for_each;
+	using std::remove_if;
+
+	TooBig<int> f100(100);	// limit = 100
+	int vals[10] = { 50, 100, 90, 180, 60, 210, 415, 88, 188, 201 };
+	list<int> yadayada(vals, vals + 10);	// range constructor
+	list<int> etcetera(vals, vals + 10);
+
+ // C++0x can use the following instead
+//  list<int> yadayada = {50, 100, 90, 180, 60, 210, 415, 88, 188, 201};
+//  list<int> etcetera {50, 100, 90, 180, 60, 210, 415, 88, 188, 201};
+
+	cout << "Original lists:\n";
+	for_each(yadayada.begin(), yadayada.end(), outint);
+	cout << endl << endl;
+	for_each(etcetera.begin(), etcetera.end(), outint);
+	cout << endl << endl;
+	yadayada.remove_if(f100);				// use a named function object
+	etcetera.remove_if(TooBig<int>(200));	// construct a function object
+	cout << "Trimmed lists:\n";
+	for_each(yadayada.begin(), yadayada.end(), outint);
+	cout << endl << endl;
+	for_each(etcetera.begin(), etcetera.end(), outint);
+	cout << endl << endl;
+	// std::cin.get();
 }
